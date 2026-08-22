@@ -19,6 +19,108 @@ import random
 import time
 from supabase import create_client, Client
 
+# ===================================================================
+# CONSTANTS FOR REGISTRATION FORM
+# ===================================================================
+
+STATUS_OPTIONS = [
+    "Professor",
+    "Associate Professor",
+    "Assistant Professor",
+    "Lecturer",
+    "Senior Lecturer",
+    "PhD Candidate",
+    "MSc Student",
+    "Undergraduate Student",
+    "Postdoctoral Researcher",
+    "Research Fellow",
+    "Research Assistant",
+    "Other"
+]
+
+DEPARTMENT_OPTIONS = [
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Computer Science",
+    "Information Technology",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+    "Civil Engineering",
+    "Chemical Engineering",
+    "Agricultural Science",
+    "Economics",
+    "Business Management",
+    "Public Health",
+    "Law",
+    "Education",
+    "Psychology",
+    "Sociology",
+    "Other"
+]
+
+STUDENT_LEVEL_OPTIONS = [
+    "Undergraduate",
+    "MSc/MA",
+    "PhD"
+]
+
+COUNTRIES_WITH_FLAGS = [
+    "🇪🇹 Ethiopia",
+    "🇺🇸 United States",
+    "🇬🇧 United Kingdom",
+    "🇩🇪 Germany",
+    "🇫🇷 France",
+    "🇰🇪 Kenya",
+    "🇳🇬 Nigeria",
+    "🇿🇦 South Africa",
+    "🇪🇬 Egypt",
+    "🇮🇳 India",
+    "🇨🇳 China",
+    "🇯🇵 Japan",
+    "🇦🇺 Australia",
+    "🇨🇦 Canada",
+    "🇧🇷 Brazil",
+    "🇷🇺 Russia",
+    "🇮🇹 Italy",
+    "🇪🇸 Spain",
+    "🇳🇱 Netherlands",
+    "🇸🇪 Sweden",
+    "🇨🇭 Switzerland",
+    "🇧🇪 Belgium",
+    "🇦🇹 Austria",
+    "🇵🇱 Poland",
+    "🇬🇷 Greece",
+    "🇹🇷 Turkey",
+    "🇮🇷 Iran",
+    "🇵🇰 Pakistan",
+    "🇧🇩 Bangladesh",
+    "🇮🇩 Indonesia",
+    "🇵🇭 Philippines",
+    "🇻🇳 Vietnam",
+    "🇰🇷 South Korea",
+    "🇲🇽 Mexico",
+    "🇦🇷 Argentina",
+    "🇨🇱 Chile",
+    "🇨🇴 Colombia",
+    "🇵🇪 Peru",
+    "🇻🇪 Venezuela",
+    "🇲🇾 Malaysia",
+    "🇸🇬 Singapore",
+    "🇹🇭 Thailand",
+    "🇸🇦 Saudi Arabia",
+    "🇦🇪 United Arab Emirates",
+    "🇮🇱 Israel",
+    "🇳🇿 New Zealand",
+    "🇮🇪 Ireland",
+    "🇵🇹 Portugal",
+    "🇳🇴 Norway",
+    "🇫🇮 Finland",
+    "🇩🇰 Denmark",
+    "Other"
+]
+
 st.set_page_config(
     page_title="Ethiopian Research Collaboration Portal",
     page_icon="🌿🇪🇹🎉",
