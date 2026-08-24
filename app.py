@@ -1,7 +1,7 @@
 # ===================================================================
 # ETHIOPIAN ACADEMIC PORTAL - RESEARCH COLLABORATION SYSTEM
 # WITH SUPABASE PERSISTENCE
-# Berhanu Mekonen, PhD, Arba Minch University, June 25, 2026
+# Berhanu Mekonen, PhD, Arba Minch University, June 25, 2026 
 # ===================================================================
 
 import streamlit as st
