@@ -2460,7 +2460,7 @@ def show_login_page():
                 password = st.text_input("🔒 Password", type="password", placeholder="Enter your password")
                 col1, col2, col3 = st.columns([1, 2, 1])
                 with col2:
-                    submitted = st.form_submit_button("Sign In", use_container_width=True)
+                    submitted = st.form_submit_button("🇪🇹🌍🎓 Sign In 🔐🔑", use_container_width=True)
                 if submitted:
                     if not username or not password:
                         st.error("❌ Please enter both username and password.")
