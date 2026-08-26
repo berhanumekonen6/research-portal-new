@@ -2327,7 +2327,7 @@ def show_about_page():
     st.markdown("### About the Ethiopian Research Collaboration Portal")
     st.markdown("""
     <div class="about-section">
-        <h2>🌿🇪🇹🎉 📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀About This Portal</h2>
+        <h2>📚✍️🌍ኢትዮጲያ🕊️🎓🚀About This Portal</h2>
         <p>The <b>Ethiopian Research Collaboration Portal</b> is a digital platform designed to bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
         <div class="stat-grid">
             <div class="stat-card"><span class="number">8</span><span class="label">👨‍🏫 Verified Professionals</span></div>
@@ -2445,7 +2445,7 @@ def show_login_page():
     init_user_db()
     st.markdown("""
     <div style="text-align:center; padding:1rem 0;">
-        <div style="font-size:4rem; margin-bottom:0.5rem;">🌿🇪🇹🎉📚✍️🌍<span style="color: #078930;">ኢ</span><span style="color: #FCDD09;">ት</span><span style="color: #DA121A;">ዮ</span><span style="color: #078930;">ጲ</span><span style="color: #FCDD09;">ያ</span>🕊️🎓🚀</</div>
+        <div style="font-size:4rem; margin-bottom:0.5rem;">📚✍️🌍<span style="color: #078930;">ኢ</span><span style="color: #FCDD09;">ት</span><span style="color: #DA121A;">ዮ</span><span style="color: #078930;">ጲ</span><span style="color: #FCDD09;">ያ</span>🕊️🎓🚀</</div>
         <h1 style="font-size:3rem; margin:0;">Research Collaboration Portal</h1>
         <p style="color:#5F6368; font-size:1.2rem; margin-top:0.5rem;">🌿🇪🇹🎉Sign in to access the Ethiopian Research Network📚✍️🌍ኢትዮጲያ🕊️🎓🚀</p>
         <p style="color:#5F6368; font-size:1rem; margin-top:0.3rem;">Please register first if you don't have an account✍️🌍</p>
