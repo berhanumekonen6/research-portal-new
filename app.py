@@ -2505,7 +2505,7 @@ def show_login_page():
             </div>
             """, unsafe_allow_html=True)
             with st.form("registration_request_form"):
-                full_name = st.text_input("👤 Full Name *", placeholder="e.g., Berhanu Mekonen")
+                full_name = st.text_input("👤 Full Name *", placeholder="e.g., Berhanu Mekonen Alemu")
                 username = st.text_input("📧 Email Address (username) *", placeholder="your.name@amu.edu.et")
                 password = st.text_input("🔒 Create Password *", type="password", placeholder="Minimum 6 characters")
                 confirm_password = st.text_input("✅ Confirm Password *", type="password", placeholder="Re-enter your password")
