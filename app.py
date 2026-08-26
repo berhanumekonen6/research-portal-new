@@ -122,8 +122,8 @@ COUNTRIES_WITH_FLAGS = [
 ]
 
 st.set_page_config(
-    page_title="Ethiopian Research Collaboration Portal",
-    page_icon="🌿🇪🇹🎉📚✍️🌍ኢትዮጲያ🕊️🎓🚀",
+    page_title="🌿📚✍️🌍ኢትዮጲያ🕊️🎓🎉Ethiopian Research Collaboration Portal",
+    page_icon="📚✍️🌍ኢትዮጲያ🕊️🎓🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -2446,7 +2446,7 @@ def show_login_page():
     st.markdown("""
     <div style="text-align:center; padding:1rem 0;">
         <div style="font-size:4rem; margin-bottom:0.5rem;">🌿🇪🇹🎉📚✍️🌍<span style="color: #078930;">ኢ</span><span style="color: #FCDD09;">ት</span><span style="color: #DA121A;">ዮ</span><span style="color: #078930;">ጲ</span><span style="color: #FCDD09;">ያ</span>🕊️🎓🚀</</div>
-        <h1 style="font-size:3rem; margin:0;">Research Collaboration Portal</h1>
+        <h1 style="font-size:3rem; margin:0;">🌿📚✍️ኢትዮጲያ🌍🕊️🎓Research Collaboration Portal</h1>
         <p style="color:#5F6368; font-size:1.2rem; margin-top:0.5rem;">Sign in to access the Ethiopian Research Network📚✍️🌍ኢትዮጲያ🕊️🎓🚀</p>
         <p style="color:#5F6368; font-size:1rem; margin-top:0.3rem;">Please register first if you don't have an account✍️🌍</p>
     </div>
@@ -2698,7 +2698,7 @@ def main():
             <div class="logo-section">
                 <div class="logo-icon">🌿🇪🇹🎉📚✍️🌍ኢትዮጲያ🕊️🎓🚀</div>
                 <div class="logo-text">
-                    <h1>Ethiopian Research Collaboration Portal</h1>
+                    <h1>🌿📚✍️ኢትዮጲያ🌍🕊️🎓Ethiopian Research Collaboration Portal</h1>
                     <div class="subtitle">Connecting <span class="highlight">Ethiopian</span> Researchers & Academic Professionals</div>
                     <div class="developer-credit">🌿🇪🇹🎉 <span class="highlight-name">Berhanu Mekonen, PhD</span> · <span class="highlight-institution">Arba Minch University</span> · June 25, 2026</div>
                 </div>
