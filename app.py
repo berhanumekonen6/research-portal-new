@@ -1701,7 +1701,7 @@ RESEARCHER_PROFILES = {
         ],
         "email": "abebe.geletu@aims.ac.rw",
         "phone": "+250 788 888 888",
-        "orcid_id": "0000-0001-2345-6789",
+        "orcid_id": "0000-0001-5617-3398",
         "orcid_url": "https://orcid.org/0000-0001-5617-3398",
         "researchgate_url": "https://www.researchgate.net/profile/Abebe-Geletu",
         "google_scholar_url": "https://scholar.google.com/citations?user=abebe_geletu",
