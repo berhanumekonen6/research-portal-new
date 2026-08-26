@@ -2492,9 +2492,6 @@ def show_login_page():
                 <p style="color:#5F6368; font-size:0.9rem; margin:0;">
                     📞 Phone: <b style="color:#1A73E8;">+251 905 527 481</b>
                 </p>
-                <p style="color:#5F6368; font-size:0.85rem; margin-top:0.5rem;">
-                    ⚠️ Admin: username <b>admin</b> password <b>admin</b>
-                </p>
             </div>
             """, unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
