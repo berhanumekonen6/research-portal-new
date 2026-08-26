@@ -123,7 +123,7 @@ COUNTRIES_WITH_FLAGS = [
 
 st.set_page_config(
     page_title="🌿Ethiopian Research Collaboration Portal",
-    page_icon="📚✍️🌍ኢትዮጲያ🕊️🎓🚀",
+    page_icon="📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -2327,7 +2327,7 @@ def show_about_page():
     st.markdown("### About the Ethiopian Research Collaboration Portal")
     st.markdown("""
     <div class="about-section">
-        <h2>📚✍️🌍ኢትዮጲያ🕊️🎓🚀About This Portal</h2>
+        <h2>📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀About This Portal</h2>
         <p>The <b>Ethiopian Research Collaboration Portal</b> is a digital platform designed to bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
         <div class="stat-grid">
             <div class="stat-card"><span class="number">8</span><span class="label">👨‍🏫 Verified Professionals</span></div>
@@ -2693,7 +2693,7 @@ def main():
     <div class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="logo-icon">📚✍️🌍ኢትዮጲያ🕊️🎓🚀</div>
+                <div class="logo-icon">📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀</div>
                 <div class="logo-text">
                     <h1>🌿📚✍️ኢትዮጲያ🌍🕊️🎓Ethiopian Research Collaboration Portal</h1>
                     <div class="subtitle">Connecting <span class="highlight">Ethiopian</span> Researchers & Academic Professionals</div>
