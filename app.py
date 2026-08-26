@@ -123,7 +123,7 @@ COUNTRIES_WITH_FLAGS = [
 
 st.set_page_config(
     page_title="Ethiopian Research Collaboration Portal",
-    page_icon="🌿🇪🇹🎉",
+    page_icon="🌿🇪🇹🎉📚✍️🌍ኢትዮጲያ🕊️🎓🚀",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -2327,7 +2327,7 @@ def show_about_page():
     st.markdown("### About the Ethiopian Research Collaboration Portal")
     st.markdown("""
     <div class="about-section">
-        <h2>🌿🇪🇹🎉 About This Portal</h2>
+        <h2>🌿🇪🇹🎉 📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀About This Portal</h2>
         <p>The <b>Ethiopian Research Collaboration Portal</b> is a digital platform designed to bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
         <div class="stat-grid">
             <div class="stat-card"><span class="number">8</span><span class="label">👨‍🏫 Verified Professionals</span></div>
@@ -2338,7 +2338,7 @@ def show_about_page():
         <h3>📌 Key Importance</h3>
         <ul><li>Connects Ethiopian researchers across institutions</li><li>Enhances research supervision and mentorship</li><li>Promotes joint research and publications</li><li>Creates consultancy opportunities</li></ul>
         <div class="quote">"The Research Collaboration Portal is not just a tool—it's a movement to transform Ethiopian research from isolated silos into a connected, collaborative, and globally competitive academic ecosystem."</div>
-        <div class="footer-credit">🌿🇪🇹🎉 Berhanu Mekonen, PhD · Arba Minch University · June 25, 2026</div>
+        <div class="footer-credit">🌿🇪🇹🎉 📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀Berhanu Mekonen, PhD · Arba Minch University · June 25, 2026</div>
     </div>
     """, unsafe_allow_html=True)
     if st.button("🔙 Back to Main Portal", use_container_width=True):
@@ -2445,13 +2445,13 @@ def show_login_page():
     init_user_db()
     st.markdown("""
     <div style="text-align:center; padding:1rem 0;">
-        <div style="font-size:4rem; margin-bottom:0.5rem;">🌿🇪🇹🎉</div>
+        <div style="font-size:4rem; margin-bottom:0.5rem;">🌿🇪🇹🎉📚✍️🌍ኢትዮጲያ🕊️🎓🚀</</div>
         <h1 style="font-size:3rem; margin:0;">Research Collaboration Portal</h1>
-        <p style="color:#5F6368; font-size:1.2rem; margin-top:0.5rem;">Sign in to access the Ethiopian Research Network</p>
+        <p style="color:#5F6368; font-size:1.2rem; margin-top:0.5rem;">Sign in to access the Ethiopian Research Network💪📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀</p>
         <p style="color:#5F6368; font-size:1rem; margin-top:0.3rem;">Please register first if you don't have an account</p>
     </div>
     """, unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["🔐 Login", "📝 Request Registration"])
+    tab1, tab2 = st.tabs(["🔐 Login📚✍️🌍ኢትዮጲያ🕊️🎓🚀", "📝 Request Registration💪📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀"])
     with tab1:
         with st.container():
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
@@ -2696,7 +2696,7 @@ def main():
     <div class="main-header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="logo-icon">🌿🇪🇹🎉</div>
+                <div class="logo-icon">🌿🇪🇹🎉📚✍️🌍ኢትዮጲያ🕊️🎓🚀</div>
                 <div class="logo-text">
                     <h1>Ethiopian Research Collaboration Portal</h1>
                     <div class="subtitle">Connecting <span class="highlight">Ethiopian</span> Researchers & Academic Professionals</div>
