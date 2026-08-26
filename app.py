@@ -1690,7 +1690,7 @@ RESEARCHER_PROFILES = {
             "An analytical Hessian and parallel computing approach for efficient dynamic optimization. Industrial Engineering Chemical Research, 54(48), 12086-12095, 2015."
         ],
         "supervisory_capacity": 8,
-        "current_students": 7,
+        "current_students": 7, 
         "completed_phds": 3,
         "available_for_collaboration": True,
         "collaboration_types": ["Research Supervision", "Joint Research", "Consultancy", "Peer Review"],
