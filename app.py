@@ -2451,7 +2451,7 @@ def show_login_page():
         <p style="color:#5F6368; font-size:1rem; margin-top:0.3rem;">Please register first if you don't have an account✍️🌍</p>
     </div>
     """, unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["🔐 Login📚✍️ኢትዮጲያ🌍", "📝 Request Registration📚✍️"])
+    tab1, tab2 = st.tabs(["🇪🇹🌍🎓Login 🔐🔑", "🇪🇹📚🔬 Request Registration📚✍️✅"])
     with tab1:
         with st.container():
             st.markdown('<div class="login-container">', unsafe_allow_html=True)
