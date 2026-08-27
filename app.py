@@ -1571,7 +1571,7 @@ RESEARCHER_PROFILES = {
         "completed_phds": 0,
         "available_for_collaboration": True,
         "collaboration_types": ["Research Supervision", "Joint Research", "Consultancy"],
-        "email": "berhanumekonen6@gmail.com",
+        "email": "berhanumekonen6@gmail.com/ berhanu.mekonen@amu.edu.et",
         "phone": "+2519-05-52-74-81",
         "orcid_id": "0009-0001-4034-7944",
         "orcid_url": "https://orcid.org/0009-0001-4034-7944",
