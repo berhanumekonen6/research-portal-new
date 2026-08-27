@@ -1538,7 +1538,7 @@ def show_celebration_page():
         st.components.v1.html(html_content, height=800, scrolling=False)
 
 # ===================================================================
-# RESEARCHER PROFILES - ALL 8 RESEARCHERS
+# RESEARCHER PROFILES
 # ===================================================================
 
 RESEARCHER_PROFILES = {
