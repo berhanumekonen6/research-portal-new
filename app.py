@@ -122,7 +122,7 @@ COUNTRIES_WITH_FLAGS = [
 ]
 
 st.set_page_config(
-    page_title="🌿Ethiopian Research Collaboration Portal",
+    page_title="🌿Research Collaboration Portal",
     page_icon="📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -2695,7 +2695,7 @@ def main():
             <div class="logo-section">
                 <div class="logo-icon">📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀</div>
                 <div class="logo-text">
-                    <h1>🌿📚✍️ኢትዮጲያ🌍🕊️🎓Ethiopian Research Collaboration Portal</h1>
+                    <h1>🌿📚✍️ኢትዮጲያ🌍🕊️🎓Research Collaboration Portal</h1>
                     <div class="subtitle">Connecting <span class="highlight">Ethiopian</span> Researchers & Academic Professionals</div>
                     <div class="developer-credit">🌿🇪🇹🎉 <span class="highlight-name">Berhanu Mekonen, PhD</span> · <span class="highlight-institution">Arba Minch University</span> · June 25, 2026</div>
                 </div>
