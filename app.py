@@ -12,6 +12,7 @@ import json
 import re
 import hashlib
 import os
+import base64
 import plotly.express as px
 import plotly.graph_objects as go
 from collections import Counter
@@ -195,11 +196,11 @@ def load_all_data():
     res = supabase.table("forum_posts").select("*").order("id", desc=True).execute()
     st.session_state.forum_posts = res.data if res.data else []
 
-    # Chat messages (column is 'sender')
+    # Chat messages
     res = supabase.table("chat_messages").select("*").order("id").execute()
     st.session_state.chat_messages = res.data if res.data else []
 
-    # Feedback (column is 'username')
+    # Feedback
     res = supabase.table("feedback").select("*").order("id", desc=True).execute()
     st.session_state.feedback = res.data if res.data else []
 
@@ -244,7 +245,13 @@ def load_all_data():
 
     # Reading Materials
     res = supabase.table("reading_materials").select("*").order("id", desc=True).execute()
-    st.session_state.reading_materials = res.data if res.data else []
+    if res.data:
+        for material in res.data:
+            if material.get("file_data_b64"):
+                material["file_data"] = base64.b64decode(material["file_data_b64"])
+        st.session_state.reading_materials = res.data
+    else:
+        st.session_state.reading_materials = []
 
     # Ensure admin exists
     admin_exists = "admin" in st.session_state.user_db
@@ -260,7 +267,7 @@ def load_all_data():
                 "username": "admin",
                 "name": "Administrator"
             }).execute()
-            load_all_data()  # reload
+            load_all_data()
         except Exception as e:
             st.error(f"Could not create admin: {e}")
 
@@ -299,7 +306,6 @@ def init_user_db():
         st.session_state.material_id_counter = 0
     if "edit_material_id" not in st.session_state:
         st.session_state.edit_material_id = None
-    # Ensure admin exists
     if "admin" not in st.session_state.user_db:
         load_all_data()
 
@@ -1972,8 +1978,7 @@ def show_onboarding():
                     "department": department
                 }).eq("username", st.session_state.current_user).execute()
                 st.session_state.user_profiles[st.session_state.current_user].update({"name": name, "institution": institution, "department": department})
-                st.session_state.onboarding_step = 2
-                st.rerun()
+                st.session_state.onboarding_step = 2                st.rerun()
             except Exception as e:
                 st.error(f"Error updating profile: {e}")
     elif step == 2:
@@ -2171,7 +2176,6 @@ def show_user_reading_materials():
     </div>
     """, unsafe_allow_html=True)
     
-    # Initialize reading materials in session state if not exists
     if 'reading_materials' not in st.session_state:
         st.session_state.reading_materials = []
     
@@ -2224,7 +2228,7 @@ def show_user_reading_materials():
     
     st.caption(f"📊 Found {len(filtered_materials)} material(s)")
     
-    # Display materials in a grid
+    # Display materials
     for material in filtered_materials:
         with st.container():
             st.markdown(f"""
@@ -2258,12 +2262,16 @@ def show_user_reading_materials():
             </div>
             """, unsafe_allow_html=True)
             
-            # Action buttons
             col1, col2, col3 = st.columns([1, 1, 2])
             
             with col1:
                 if material.get('file_data'):
                     material['downloads'] = material.get('downloads', 0) + 1
+                    try:
+                        supabase_admin = get_supabase_admin()
+                        supabase_admin.table("reading_materials").update({"downloads": material['downloads']}).eq("id", material['id']).execute()
+                    except:
+                        pass
                     st.download_button(
                         label="⬇️ Download",
                         data=material['file_data'],
@@ -2278,11 +2286,16 @@ def show_user_reading_materials():
             with col2:
                 if st.button("👁️ View Details", key=f"view_{material['id']}", use_container_width=True):
                     material['views'] = material.get('views', 0) + 1
+                    try:
+                        supabase_admin = get_supabase_admin()
+                        supabase_admin.table("reading_materials").update({"views": material['views']}).eq("id", material['id']).execute()
+                    except:
+                        pass
                     st.info(f"📄 **{material['title']}**\n\n{material['description']}\n\n📂 Category: {material['category']}\n🎯 Level: {material['level']}\n✍️ Author: {material['author']}")
             
             st.markdown("---")
     
-    # Statistics section
+    # Statistics
     if st.session_state.reading_materials:
         st.markdown("### 📊 Library Statistics")
         col1, col2, col3, col4 = st.columns(4)
@@ -2296,12 +2309,13 @@ def show_user_reading_materials():
 # ===================================================================
 
 def show_admin_reading_materials():
-    """Admin interface for uploading and managing reading materials"""
+    """Admin interface for uploading and managing reading materials with Supabase persistence"""
     
     st.markdown("""
     <div style="background:#E8F0FE;border:1px solid #1A73E8;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border-left:5px solid #1A73E8;">
         <h3 style="color:#202124;margin:0;">📚 Admin - Reading Materials Management</h3>
         <p style="color:#5F6368;margin:0.5rem 0 0 0;">Upload, manage, and organize reading materials for students and researchers</p>
+        <p style="color:#34A853;font-size:0.9rem;margin-top:0.3rem;">✅ Materials are saved to Supabase and persist across sessions</p>
     </div>
     """, unsafe_allow_html=True)
     
@@ -2387,33 +2401,38 @@ def show_admin_reading_materials():
                 elif not uploaded_file and not external_link:
                     st.error("❌ Please upload a file or provide an external link.")
                 else:
+                    # Generate unique ID
                     st.session_state.material_id_counter += 1
                     material_id = f"MAT{st.session_state.material_id_counter:04d}"
                     
+                    # Prepare file data
                     file_data = None
                     file_name = None
                     file_type = None
                     file_size = None
+                    file_data_b64 = None
                     
                     if uploaded_file:
                         file_data = uploaded_file.getvalue()
                         file_name = uploaded_file.name
                         file_type = uploaded_file.type
                         file_size = len(file_data)
+                        file_data_b64 = base64.b64encode(file_data).decode('utf-8')
                     
-                    material = {
+                    # Create material entry for database
+                    material_for_db = {
                         "id": material_id,
                         "title": material_title,
                         "category": material_category,
                         "type": material_type,
                         "author": material_author,
                         "description": material_description,
-                        "tags": [t.strip() for t in material_tags.split(",")] if material_tags else [],
-                        "keywords": [k.strip() for k in material_keywords.split(",")] if material_keywords else [],
+                        "tags": json.dumps([t.strip() for t in material_tags.split(",")]) if material_tags else json.dumps([]),
+                        "keywords": json.dumps([k.strip() for k in material_keywords.split(",")]) if material_keywords else json.dumps([]),
                         "level": material_level,
                         "language": material_language,
                         "access": material_access,
-                        "file_data": file_data,
+                        "file_data_b64": file_data_b64,
                         "file_name": file_name,
                         "file_type": file_type,
                         "file_size": file_size,
@@ -2425,12 +2444,25 @@ def show_admin_reading_materials():
                         "approved": True
                     }
                     
-                    st.session_state.reading_materials.append(material)
-                    add_notification(f"📚 New reading material uploaded: {material_title}", "success")
-                    st.success(f"✅ Material '{material_title}' uploaded successfully! ID: {material_id}")
-                    st.balloons()
-                    time.sleep(1)
-                    st.rerun()
+                    # Save to Supabase
+                    supabase_admin = get_supabase_admin()
+                    try:
+                        res = supabase_admin.table("reading_materials").insert(material_for_db).execute()
+                        if res.data:
+                            # Add file_data back for session
+                            saved_material = res.data[0]
+                            if file_data:
+                                saved_material["file_data"] = file_data
+                            st.session_state.reading_materials.insert(0, saved_material)
+                            add_notification(f"📚 New reading material uploaded: {material_title}", "success")
+                            st.success(f"✅ Material '{material_title}' uploaded successfully! ID: {material_id}")
+                            st.balloons()
+                            time.sleep(1)
+                            st.rerun()
+                        else:
+                            st.error("❌ Failed to save to database.")
+                    except Exception as e:
+                        st.error(f"❌ Database error: {e}")
     
     with tab2:
         st.markdown("### 📚 Manage Reading Materials")
@@ -2456,8 +2488,8 @@ def show_admin_reading_materials():
                 if search_query in m["title"].lower() 
                 or search_query in m["author"].lower() 
                 or search_query in m["description"].lower()
-                or any(search_query in tag.lower() for tag in m["tags"])
-                or any(search_query in kw.lower() for kw in m["keywords"])
+                or any(search_query in tag.lower() for tag in m.get("tags", []))
+                or any(search_query in kw.lower() for kw in m.get("keywords", []))
             ]
         
         if category_filter != "All Categories":
@@ -2492,7 +2524,7 @@ def show_admin_reading_materials():
                     </div>
                     <p style="color:#202124;margin:0.5rem 0;">{material['description']}</p>
                     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
-                        {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material['tags'][:5])}
+                        {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material.get('tags', [])[:5])}
                     </div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -2500,8 +2532,7 @@ def show_admin_reading_materials():
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
                 
                 with col1:
-                    if material['file_data']:
-                        material['downloads'] = material.get('downloads', 0) + 1
+                    if material.get('file_data'):
                         st.download_button(
                             label="⬇️ Download",
                             data=material['file_data'],
@@ -2509,7 +2540,7 @@ def show_admin_reading_materials():
                             mime=material['file_type'],
                             key=f"admin_download_{material['id']}"
                         )
-                    elif material['external_link']:
+                    elif material.get('external_link'):
                         st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;">🔗 Open Link</a>', unsafe_allow_html=True)
                 
                 with col2:
@@ -2519,10 +2550,15 @@ def show_admin_reading_materials():
                 
                 with col3:
                     if st.button("🗑️ Delete", key=f"delete_{material['id']}"):
-                        st.session_state.reading_materials = [m for m in st.session_state.reading_materials if m['id'] != material['id']]
-                        add_notification(f"🗑️ Material '{material['title']}' deleted", "warning")
-                        st.success(f"✅ Material '{material['title']}' deleted successfully!")
-                        st.rerun()
+                        supabase_admin = get_supabase_admin()
+                        try:
+                            supabase_admin.table("reading_materials").delete().eq("id", material['id']).execute()
+                            st.session_state.reading_materials = [m for m in st.session_state.reading_materials if m['id'] != material['id']]
+                            add_notification(f"🗑️ Material '{material['title']}' deleted", "warning")
+                            st.success(f"✅ Material '{material['title']}' deleted successfully!")
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"❌ Error deleting: {e}")
                 
                 if st.session_state.get('edit_material_id') == material['id']:
                     st.markdown("---")
@@ -2533,22 +2569,36 @@ def show_admin_reading_materials():
                         edit_category = st.selectbox("Category", ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"], 
                             index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"].index(material['category']) if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] else 0)
                         edit_description = st.text_area("Description", value=material['description'])
-                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material['tags']))
+                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material.get('tags', [])))
                         edit_level = st.selectbox("Target Level", ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"], 
                             index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] else 0)
                         
                         col1, col2 = st.columns(2)
                         with col1:
                             if st.form_submit_button("💾 Save Changes"):
-                                material['title'] = edit_title
-                                material['category'] = edit_category
-                                material['description'] = edit_description
-                                material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
-                                material['level'] = edit_level
-                                add_notification(f"📝 Material '{material['title']}' updated", "info")
-                                st.success("✅ Material updated successfully!")
-                                st.session_state.edit_material_id = None
-                                st.rerun()
+                                supabase_admin = get_supabase_admin()
+                                try:
+                                    update_data = {
+                                        "title": edit_title,
+                                        "category": edit_category,
+                                        "description": edit_description,
+                                        "tags": json.dumps([t.strip() for t in edit_tags.split(",")]) if edit_tags else json.dumps([]),
+                                        "level": edit_level
+                                    }
+                                    supabase_admin.table("reading_materials").update(update_data).eq("id", material['id']).execute()
+                                    
+                                    material['title'] = edit_title
+                                    material['category'] = edit_category
+                                    material['description'] = edit_description
+                                    material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
+                                    material['level'] = edit_level
+                                    
+                                    add_notification(f"📝 Material '{material['title']}' updated", "info")
+                                    st.success("✅ Material updated successfully!")
+                                    st.session_state.edit_material_id = None
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"❌ Error updating: {e}")
                         with col2:
                             if st.form_submit_button("❌ Cancel"):
                                 st.session_state.edit_material_id = None
