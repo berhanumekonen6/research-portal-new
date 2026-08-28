@@ -2054,7 +2054,7 @@ RESEARCHER_PROFILES = {
             {"name": "Prof. P. D. N. Srinivasu", "institution": "Andhra University, India"},
             {"name": "Dr. Surafel Luleseged Tilahun", "institution": "Addis Ababa Science and Technology University"},
             {"name": "Dr. Abebe Geletu", "institution": "AIMS Rwanda"},
-            {"name": "Dr. Teketel Ketema", "institution": "Mekdela Amba University"},
+            {"name": "Teketel Ketema", "institution": "Mekdela Amba University"},
             {"name": "Worku T. Bitew", "institution": "State University of New York at Farmingdale"},
             {"name": "Prof. Seshadev Padhi", "institution": "Birla Institute of Technology"}
         ],
@@ -2069,7 +2069,7 @@ RESEARCHER_PROFILES = {
     },
         "researcher_9": {
         "id": "A009",
-        "name": "Dr. Teketel Ketema",
+        "name": "Teketel Ketema",
         "title": "Researcher / PhD Candidate",
         "institution": "Mekdela Amba University",
         "department": "Department of Mathematics",
