@@ -1978,7 +1978,8 @@ def show_onboarding():
                     "department": department
                 }).eq("username", st.session_state.current_user).execute()
                 st.session_state.user_profiles[st.session_state.current_user].update({"name": name, "institution": institution, "department": department})
-                st.session_state.onboarding_step = 2                st.rerun()
+                st.session_state.onboarding_step = 2
+                st.rerun()
             except Exception as e:
                 st.error(f"Error updating profile: {e}")
     elif step == 2:
