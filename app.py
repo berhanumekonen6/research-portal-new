@@ -242,6 +242,10 @@ def load_all_data():
     res = supabase.table("requests").select("*").order("id", desc=True).execute()
     st.session_state.requests = res.data if res.data else []
 
+    # Reading Materials
+    res = supabase.table("reading_materials").select("*").order("id", desc=True).execute()
+    st.session_state.reading_materials = res.data if res.data else []
+
     # Ensure admin exists
     admin_exists = "admin" in st.session_state.user_db
     if not admin_exists:
@@ -289,6 +293,12 @@ def init_user_db():
         st.session_state.onboarding_step = 1
     if "celebration_dismissed" not in st.session_state:
         st.session_state.celebration_dismissed = False
+    if "reading_materials" not in st.session_state:
+        st.session_state.reading_materials = []
+    if "material_id_counter" not in st.session_state:
+        st.session_state.material_id_counter = 0
+    if "edit_material_id" not in st.session_state:
+        st.session_state.edit_material_id = None
     # Ensure admin exists
     if "admin" not in st.session_state.user_db:
         load_all_data()
@@ -2957,77 +2967,423 @@ def show_login_page():
             st.markdown('</div>', unsafe_allow_html=True)
 
 # ===================================================================
-# ADMIN PANEL
+# READING MATERIALS MANAGEMENT - ADMIN SECTION
+# ===================================================================
+
+def show_admin_reading_materials():
+    """Admin interface for uploading and managing reading materials"""
+    
+    st.markdown("""
+    <div style="background:#E8F0FE;border:1px solid #1A73E8;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border-left:5px solid #1A73E8;">
+        <h3 style="color:#202124;margin:0;">📚 Admin - Reading Materials Management</h3>
+        <p style="color:#5F6368;margin:0.5rem 0 0 0;">Upload, manage, and organize reading materials for students and researchers</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Initialize reading materials in session state if not exists
+    if 'reading_materials' not in st.session_state:
+        st.session_state.reading_materials = []
+    if 'material_id_counter' not in st.session_state:
+        st.session_state.material_id_counter = 0
+    
+    tab1, tab2, tab3 = st.tabs(["📤 Upload Material", "📚 Manage Materials", "📊 Statistics"])
+    
+    # ==================== TAB 1: UPLOAD ====================
+    with tab1:
+        st.markdown("### 📤 Upload New Reading Material")
+        
+        with st.form("upload_material_form", clear_on_submit=True):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                material_title = st.text_input("📌 Material Title *", placeholder="e.g., Research Methodology Guide")
+                material_category = st.selectbox(
+                    "📂 Category *",
+                    ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", 
+                     "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", 
+                     "Reference Materials", "Study Guides", "Other"]
+                )
+                material_type = st.selectbox(
+                    "📄 Material Type *",
+                    ["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"]
+                )
+                material_level = st.selectbox(
+                    "🎯 Target Level *",
+                    ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"]
+                )
+            
+            with col2:
+                material_author = st.text_input("✍️ Author/Uploader *", value="Admin")
+                material_tags = st.text_input("🏷️ Tags (comma separated)", placeholder="e.g., research, methodology, statistics")
+                material_language = st.selectbox(
+                    "🌍 Language",
+                    ["English", "Amharic", "Both"]
+                )
+                material_access = st.selectbox(
+                    "🔒 Access Level",
+                    ["Public", "Registered Users Only", "Admin Only"]
+                )
+            
+            material_description = st.text_area("📝 Description *", height=100, placeholder="Brief description of the material...")
+            material_keywords = st.text_input("🔍 Keywords (comma separated)", placeholder="e.g., research methods, data analysis, SPSS")
+            
+            uploaded_file = st.file_uploader(
+                "📎 Upload File",
+                type=['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'csv', 'zip'],
+                help="Upload the reading material file (Max 200MB)"
+            )
+            
+            external_link = st.text_input("🔗 External Link", placeholder="https://... (if applicable)")
+            
+            # Preview section
+            if uploaded_file:
+                st.markdown("---")
+                st.markdown("#### 📄 File Preview")
+                file_extension = uploaded_file.name.split('.')[-1].lower() if uploaded_file.name else ''
+                
+                if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+                    st.image(uploaded_file, caption="File Preview", use_container_width=True)
+                elif file_extension == 'pdf':
+                    st.info("📄 PDF file ready for upload. Users can download and view it.")
+                elif file_extension in ['txt', 'csv']:
+                    try:
+                        content = uploaded_file.getvalue().decode('utf-8')
+                        st.text_area("Content Preview", content[:500] + ("..." if len(content) > 500 else ""), height=150, disabled=True)
+                    except:
+                        st.info("File content preview not available.")
+                else:
+                    st.info(f"📄 File type: {file_extension.upper()}. Ready for upload.")
+            
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                submitted = st.form_submit_button("📤 Upload Material", use_container_width=True)
+            
+            if submitted:
+                if not material_title or not material_author or not material_category or not material_description:
+                    st.error("❌ Please fill in all required fields (Title, Author, Category, Description).")
+                elif not uploaded_file and not external_link:
+                    st.error("❌ Please upload a file or provide an external link.")
+                else:
+                    # Generate unique ID
+                    st.session_state.material_id_counter += 1
+                    material_id = f"MAT{st.session_state.material_id_counter:04d}"
+                    
+                    # Save file if uploaded
+                    file_data = None
+                    file_name = None
+                    file_type = None
+                    file_size = None
+                    
+                    if uploaded_file:
+                        file_data = uploaded_file.getvalue()
+                        file_name = uploaded_file.name
+                        file_type = uploaded_file.type
+                        file_size = len(file_data)
+                    
+                    # Create material entry
+                    material = {
+                        "id": material_id,
+                        "title": material_title,
+                        "category": material_category,
+                        "type": material_type,
+                        "author": material_author,
+                        "description": material_description,
+                        "tags": [t.strip() for t in material_tags.split(",")] if material_tags else [],
+                        "keywords": [k.strip() for k in material_keywords.split(",")] if material_keywords else [],
+                        "level": material_level,
+                        "language": material_language,
+                        "access": material_access,
+                        "file_data": file_data,
+                        "file_name": file_name,
+                        "file_type": file_type,
+                        "file_size": file_size,
+                        "external_link": external_link,
+                        "upload_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "uploaded_by": st.session_state.current_user,
+                        "downloads": 0,
+                        "views": 0,
+                        "approved": True
+                    }
+                    
+                    st.session_state.reading_materials.append(material)
+                    add_notification(f"📚 New reading material uploaded: {material_title}", "success")
+                    st.success(f"✅ Material '{material_title}' uploaded successfully! ID: {material_id}")
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+    
+    # ==================== TAB 2: MANAGE ====================
+    with tab2:
+        st.markdown("### 📚 Manage Reading Materials")
+        
+        if not st.session_state.reading_materials:
+            st.info("No materials uploaded yet. Use the 'Upload Material' tab to add resources.")
+            return
+        
+        # Search and filter
+        col1, col2, col3 = st.columns([2, 1.5, 1])
+        with col1:
+            search_query = st.text_input("🔍 Search Materials", placeholder="Search by title, author, category...")
+        with col2:
+            category_filter = st.selectbox("📂 Filter by Category", ["All Categories"] + sorted(set([m["category"] for m in st.session_state.reading_materials])))
+        with col3:
+            level_filter = st.selectbox("🎯 Filter by Level", ["All Levels"] + sorted(set([m["level"] for m in st.session_state.reading_materials])))
+        
+        # Filter materials
+        filtered_materials = st.session_state.reading_materials
+        
+        if search_query:
+            search_query = search_query.lower()
+            filtered_materials = [
+                m for m in filtered_materials 
+                if search_query in m["title"].lower() 
+                or search_query in m["author"].lower() 
+                or search_query in m["description"].lower()
+                or any(search_query in tag.lower() for tag in m["tags"])
+                or any(search_query in kw.lower() for kw in m["keywords"])
+            ]
+        
+        if category_filter != "All Categories":
+            filtered_materials = [m for m in filtered_materials if m["category"] == category_filter]
+        
+        if level_filter != "All Levels":
+            filtered_materials = [m for m in filtered_materials if m["level"] == level_filter]
+        
+        st.caption(f"📊 Found {len(filtered_materials)} material(s)")
+        
+        # Display materials
+        for material in filtered_materials:
+            with st.container():
+                st.markdown(f"""
+                <div style="background:#FFFFFF;border:1px solid #E8EAED;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                        <div style="flex:1;">
+                            <h4 style="color:#1A73E8;margin:0;">{material['title']}</h4>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
+                                <span style="background:#E8F0FE;color:#1A73E8;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['category']}</span>
+                                <span style="background:#FCE8E6;color:#EA4335;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['type']}</span>
+                                <span style="background:#E6F4EA;color:#34A853;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['level']}</span>
+                                <span style="background:#FFF3E0;color:#FB8C00;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['language']}</span>
+                                <span style="color:#5F6368;font-size:0.85rem;">📅 {material['upload_date']}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="background:#F8F9FA;color:#5F6368;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500;">ID: {material['id']}</span>
+                            <br>
+                            <span style="color:#5F6368;font-size:0.85rem;">👁️ {material.get('views', 0)} views</span>
+                            <span style="color:#5F6368;font-size:0.85rem;">⬇️ {material.get('downloads', 0)} downloads</span>
+                        </div>
+                    </div>
+                    <p style="color:#202124;margin:0.5rem 0;">{material['description']}</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
+                        {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material['tags'][:5])}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                # Action buttons
+                col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
+                
+                with col1:
+                    if material['file_data']:
+                        material['downloads'] = material.get('downloads', 0) + 1
+                        st.download_button(
+                            label="⬇️ Download",
+                            data=material['file_data'],
+                            file_name=material['file_name'],
+                            mime=material['file_type'],
+                            key=f"admin_download_{material['id']}"
+                        )
+                    elif material['external_link']:
+                        st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;">🔗 Open Link</a>', unsafe_allow_html=True)
+                
+                with col2:
+                    if st.button("📋 Edit", key=f"edit_{material['id']}"):
+                        st.session_state.edit_material_id = material['id']
+                        st.rerun()
+                
+                with col3:
+                    if st.button("🗑️ Delete", key=f"delete_{material['id']}"):
+                        st.session_state.reading_materials = [m for m in st.session_state.reading_materials if m['id'] != material['id']]
+                        add_notification(f"🗑️ Material '{material['title']}' deleted", "warning")
+                        st.success(f"✅ Material '{material['title']}' deleted successfully!")
+                        st.rerun()
+                
+                # Edit mode
+                if st.session_state.get('edit_material_id') == material['id']:
+                    st.markdown("---")
+                    st.markdown("#### ✏️ Edit Material")
+                    
+                    with st.form(f"edit_form_{material['id']}"):
+                        edit_title = st.text_input("Title", value=material['title'])
+                        edit_category = st.selectbox("Category", ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"], index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"].index(material['category']) if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] else 0)
+                        edit_description = st.text_area("Description", value=material['description'])
+                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material['tags']))
+                        edit_level = st.selectbox("Target Level", ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"], index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] else 0)
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.form_submit_button("💾 Save Changes"):
+                                material['title'] = edit_title
+                                material['category'] = edit_category
+                                material['description'] = edit_description
+                                material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
+                                material['level'] = edit_level
+                                add_notification(f"📝 Material '{material['title']}' updated", "info")
+                                st.success("✅ Material updated successfully!")
+                                st.session_state.edit_material_id = None
+                                st.rerun()
+                        with col2:
+                            if st.form_submit_button("❌ Cancel"):
+                                st.session_state.edit_material_id = None
+                                st.rerun()
+                
+                st.markdown("---")
+    
+    # ==================== TAB 3: STATISTICS ====================
+    with tab3:
+        st.markdown("### 📊 Reading Materials Statistics")
+        
+        if not st.session_state.reading_materials:
+            st.info("No materials uploaded yet.")
+            return
+        
+        # Summary stats
+        total_materials = len(st.session_state.reading_materials)
+        total_downloads = sum(m.get('downloads', 0) for m in st.session_state.reading_materials)
+        total_views = sum(m.get('views', 0) for m in st.session_state.reading_materials)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("📚 Total Materials", total_materials)
+        col2.metric("⬇️ Total Downloads", total_downloads)
+        col3.metric("👁️ Total Views", total_views)
+        col4.metric("📂 Categories", len(set(m['category'] for m in st.session_state.reading_materials)))
+        
+        # Category distribution
+        st.markdown("#### 📂 Materials by Category")
+        category_counts = Counter(m['category'] for m in st.session_state.reading_materials)
+        df_categories = pd.DataFrame({
+            'Category': list(category_counts.keys()),
+            'Count': list(category_counts.values())
+        })
+        fig = px.bar(df_categories, x='Category', y='Count', title='Materials by Category', color='Count', color_continuous_scale='Blues')
+        fig.update_layout(height=400)
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Level distribution
+        st.markdown("#### 🎯 Materials by Target Level")
+        level_counts = Counter(m['level'] for m in st.session_state.reading_materials)
+        df_levels = pd.DataFrame({
+            'Level': list(level_counts.keys()),
+            'Count': list(level_counts.values())
+        })
+        fig2 = px.pie(df_levels, values='Count', names='Level', title='Materials by Target Level', color_discrete_sequence=px.colors.sequential.Greens_r)
+        fig2.update_layout(height=400)
+        st.plotly_chart(fig2, use_container_width=True)
+        
+        # Most downloaded
+        st.markdown("#### ⬇️ Most Downloaded Materials")
+        sorted_by_downloads = sorted(st.session_state.reading_materials, key=lambda x: x.get('downloads', 0), reverse=True)[:10]
+        if sorted_by_downloads:
+            df_downloads = pd.DataFrame({
+                'Title': [m['title'][:30] + '...' if len(m['title']) > 30 else m['title'] for m in sorted_by_downloads],
+                'Downloads': [m.get('downloads', 0) for m in sorted_by_downloads],
+                'Category': [m['category'] for m in sorted_by_downloads]
+            })
+            fig3 = px.bar(df_downloads, x='Title', y='Downloads', title='Most Downloaded Materials', color='Category', text='Downloads')
+            fig3.update_layout(height=400, xaxis_tickangle=-45)
+            st.plotly_chart(fig3, use_container_width=True)
+        else:
+            st.info("No download data available yet.")
+
+# ===================================================================
+# ADMIN PANEL - UPDATED WITH TABS
 # ===================================================================
 
 def show_admin_panel():
     st.markdown("### 👨‍💼 Admin Dashboard")
-    st.markdown("Welcome, Administrator! Here you can manage user registrations and view system stats.")
-
-    pending = [p for p in st.session_state.pending_users if not p['approved'] and not p['rejected']]
-    if pending:
-        st.markdown(f"#### 📌 Pending Registration Requests ({len(pending)})")
-        for i, req in enumerate(pending):
-            with st.expander(f"Request from {req['full_name']} ({req['username']}) - {req['request_date']}"):
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown(f"""
-                    **Full Name:** {req['full_name']}  
-                    **Username:** {req['username']}  
-                    **Affiliation:** {req['affiliation']}  
-                    **Status:** {req['status']}  
-                    **Position:** {req.get('position', 'N/A')}  
-                    **Department:** {req['department']}  
-                    """)
-                with col2:
-                    st.markdown(f"""
-                    **Student Level:** {req.get('student_level', 'N/A')}  
-                    **Nationality:** {req['nationality']}  
-                    **Request Date:** {req['request_date']}  
-                    **Additional Info:** {req.get('other_fields', 'None')}  
-                    """)
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    if st.button(f"✅ Approve", key=f"approve_{i}"):
-                        success, msg = approve_user(i)
-                        if success:
-                            st.success(msg)
-                            st.balloons()
-                            time.sleep(0.5)
-                            st.rerun()
-                        else:
-                            st.error(msg)
-                with col_b:
-                    if st.button(f"❌ Reject", key=f"reject_{i}"):
-                        success, msg = reject_user(i)
-                        if success:
-                            st.warning(msg)
-                            st.rerun()
-                        else:
-                            st.error(msg)
-    else:
-        st.info("No pending registration requests.")
-
-    approved = [p for p in st.session_state.pending_users if p.get('approved')]
-    rejected = [p for p in st.session_state.pending_users if p.get('rejected')]
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Registered Users", len(st.session_state.user_db) - 1)
-    col2.metric("Pending Requests", len(pending))
-    col3.metric("Approved", len(approved))
-    col4.metric("Rejected", len(rejected))
-
-    st.markdown("#### 👥 All Approved Users")
-    users = [u for u in st.session_state.user_db.keys() if u != 'admin']
-    if users:
-        df_users = pd.DataFrame({
-            "Username": users,
-            "Name": [st.session_state.user_profiles.get(u, {}).get('name', 'N/A') for u in users],
-            "Affiliation": [st.session_state.user_profiles.get(u, {}).get('affiliation', 'N/A') for u in users],
-            "Status": [st.session_state.user_profiles.get(u, {}).get('status', 'N/A') for u in users]
-        })
-        st.dataframe(df_users, use_container_width=True)
-    else:
-        st.info("No approved users yet.")
+    
+    # Admin tabs
+    tab1, tab2, tab3 = st.tabs(["👥 User Management", "📚 Reading Materials", "📊 System Stats"])
+    
+    with tab1:
+        st.markdown("#### 👥 User Registration Management")
+        
+        pending = [p for p in st.session_state.pending_users if not p['approved'] and not p['rejected']]
+        if pending:
+            st.markdown(f"##### 📌 Pending Registration Requests ({len(pending)})")
+            for i, req in enumerate(pending):
+                with st.expander(f"Request from {req['full_name']} ({req['username']}) - {req['request_date']}"):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown(f"""
+                        **Full Name:** {req['full_name']}  
+                        **Username:** {req['username']}  
+                        **Affiliation:** {req['affiliation']}  
+                        **Status:** {req['status']}  
+                        **Position:** {req.get('position', 'N/A')}  
+                        **Department:** {req['department']}  
+                        """)
+                    with col2:
+                        st.markdown(f"""
+                        **Student Level:** {req.get('student_level', 'N/A')}  
+                        **Nationality:** {req['nationality']}  
+                        **Request Date:** {req['request_date']}  
+                        **Additional Info:** {req.get('other_fields', 'None')}  
+                        """)
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        if st.button(f"✅ Approve", key=f"approve_{i}"):
+                            success, msg = approve_user(i)
+                            if success:
+                                st.success(msg)
+                                st.balloons()
+                                time.sleep(0.5)
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                    with col_b:
+                        if st.button(f"❌ Reject", key=f"reject_{i}"):
+                            success, msg = reject_user(i)
+                            if success:
+                                st.warning(msg)
+                                st.rerun()
+                            else:
+                                st.error(msg)
+        else:
+            st.info("No pending registration requests.")
+        
+        approved = [p for p in st.session_state.pending_users if p.get('approved')]
+        rejected = [p for p in st.session_state.pending_users if p.get('rejected')]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Total Registered Users", len(st.session_state.user_db) - 1)
+        col2.metric("Pending Requests", len(pending))
+        col3.metric("Approved", len(approved))
+        col4.metric("Rejected", len(rejected))
+        
+        st.markdown("#### 👥 All Approved Users")
+        users = [u for u in st.session_state.user_db.keys() if u != 'admin']
+        if users:
+            df_users = pd.DataFrame({
+                "Username": users,
+                "Name": [st.session_state.user_profiles.get(u, {}).get('name', 'N/A') for u in users],
+                "Affiliation": [st.session_state.user_profiles.get(u, {}).get('affiliation', 'N/A') for u in users],
+                "Status": [st.session_state.user_profiles.get(u, {}).get('status', 'N/A') for u in users]
+            })
+            st.dataframe(df_users, use_container_width=True)
+        else:
+            st.info("No approved users yet.")
+    
+    with tab2:
+        show_admin_reading_materials()
+    
+    with tab3:
+        st.markdown("#### 📊 System Statistics")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Users", len(st.session_state.user_db))
+        col2.metric("Total Materials", len(st.session_state.reading_materials))
+        col3.metric("Total Forum Posts", len(st.session_state.forum_posts))
 
 # ===================================================================
 # MAIN APPLICATION
