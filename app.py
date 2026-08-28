@@ -2669,6 +2669,7 @@ def show_admin_panel():
 # ===================================================================
 
 def main():
+    st.cache_data.clear()   # <--- ADD THIS LINE HERE
     init_user_db()
 
     # ---- Handle celebration dismissal via query param ----
