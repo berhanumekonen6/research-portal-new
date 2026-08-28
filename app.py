@@ -369,7 +369,7 @@ def login_user(username, password):
 def logout_user():
     st.session_state.logged_in = False
     st.session_state.current_user = None
-    st.session_state.celebration_dismissed = False   # reset so celebration shows again after logout
+    st.session_state.celebration_dismissed = False
 
 def request_registration(full_name, username, password, confirm_password, affiliation, status,
                          position, department, student_level, nationality, other_fields=""):
@@ -429,13 +429,11 @@ def approve_user(request_index):
     username = req['username']
     supabase_admin = get_supabase_admin()
     try:
-        # Add user
         supabase_admin.table("users").insert({
             "username": username,
             "password_hash": req['password_hash'],
             "role": "user"
         }).execute()
-        # Add profile
         profile = {
             "username": username,
             "name": req['full_name'],
@@ -448,9 +446,7 @@ def approve_user(request_index):
             "other_fields": req['other_fields']
         }
         supabase_admin.table("user_profiles").insert(profile).execute()
-        # Mark pending as approved
         supabase_admin.table("pending_users").update({"approved": True}).eq("id", req["id"]).execute()
-        # Update session
         st.session_state.user_db[username] = req['password_hash']
         st.session_state.user_profiles[username] = profile
         req['approved'] = True
@@ -475,7 +471,7 @@ def reject_user(request_index):
         return False, f"❌ Error rejecting: {e}"
 
 # ===================================================================
-# CSS STYLES (full styling – same as original)
+# CSS STYLES
 # ===================================================================
 st.markdown("""
 <style>
@@ -543,93 +539,6 @@ st.markdown("""
         border: 1px solid #E8EAED;
         border-radius: 16px;
         box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    .login-container h1 {
-        text-align: center;
-        font-size: 2.5rem !important;
-        margin-bottom: 0.5rem;
-    }
-    .login-container .login-subtitle {
-        text-align: center;
-        color: #5F6368 !important;
-        font-size: 1.1rem !important;
-        margin-bottom: 2rem;
-    }
-    .login-container .input-label {
-        font-weight: 600 !important;
-        color: #202124 !important;
-        font-size: 1rem !important;
-        display: block;
-        margin-bottom: 0.3rem;
-    }
-    .login-container .input-hint {
-        color: #5F6368 !important;
-        font-size: 0.85rem !important;
-        font-weight: 400 !important;
-        display: block;
-        margin-top: 0.2rem;
-    }
-    .login-btn {
-        background: linear-gradient(135deg, #1A73E8, #4285F4) !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        padding: 0.9rem 2rem !important;
-        border-radius: 30px !important;
-        font-size: 1.2rem !important;
-        font-weight: 600 !important;
-        width: 100%;
-        cursor: pointer !important;
-        transition: all 0.3s !important;
-        box-shadow: 0 2px 8px rgba(26,115,232,0.25) !important;
-    }
-    .login-btn:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 16px rgba(26,115,232,0.35) !important;
-    }
-    .register-btn {
-        background: linear-gradient(135deg, #34A853, #2D9249) !important;
-        color: #FFFFFF !important;
-        border: none !important;
-        padding: 0.9rem 2rem !important;
-        border-radius: 30px !important;
-        font-size: 1.2rem !important;
-        font-weight: 600 !important;
-        width: 100%;
-        cursor: pointer !important;
-        transition: all 0.3s !important;
-        box-shadow: 0 2px 8px rgba(52,168,83,0.25) !important;
-    }
-    .register-btn:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 16px rgba(52,168,83,0.35) !important;
-    }
-
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        background: rgba(255, 255, 255, 0.9) !important;
-        padding: 8px 20px;
-        border-radius: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        backdrop-filter: blur(10px);
-    }
-    .user-info .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #1A73E8, #4285F4);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #FFFFFF;
-        font-weight: 700;
-        font-size: 1.2rem;
-    }
-    .user-info .user-name {
-        color: #202124 !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
     }
 
     .main-header {
@@ -1006,45 +915,6 @@ st.markdown("""
         font-size: 0.85rem !important;
         font-weight: 500 !important;
     }
-    .social-links {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin: 10px 0;
-    }
-    .social-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 6px 16px;
-        border-radius: 25px;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        text-decoration: none !important;
-        transition: all 0.3s ease;
-        border: 1px solid #E8EAED;
-        color: #202124 !important;
-    }
-    .social-link-orcid {
-        background: #E8F0FE !important;
-        color: #1A73E8 !important;
-        border-color: #1A73E8;
-    }
-    .social-link-researchgate {
-        background: #E6F4EA !important;
-        color: #34A853 !important;
-        border-color: #34A853;
-    }
-    .social-link-scholar {
-        background: #FCE8E6 !important;
-        color: #EA4335 !important;
-        border-color: #EA4335;
-    }
-    .social-link-scopus {
-        background: #FFF3E0 !important;
-        color: #FB8C00 !important;
-        border-color: #FB8C00;
-    }
 
     .notification-item {
         padding: 0.75rem;
@@ -1105,11 +975,6 @@ st.markdown("""
         align-items: center;
         gap: 6px;
     }
-    .badge-item.gold {
-        background: #FFF8E1 !important;
-        border-color: #FFD700;
-        color: #F9A825 !important;
-    }
 
     .feedback-item {
         background: #FFFFFF !important;
@@ -1117,40 +982,6 @@ st.markdown("""
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 1rem;
-    }
-    .feedback-item .feedback-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    .feedback-item .feedback-rating {
-        color: #FFD700;
-        font-size: 1.2rem;
-    }
-
-    .dashboard-card {
-        background: #FFFFFF !important;
-        border: 1px solid #E8EAED;
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s;
-    }
-    .dashboard-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-        border-color: #1A73E8;
-    }
-    .dashboard-card .card-value {
-        font-size: 2.8rem !important;
-        font-weight: 800 !important;
-        color: #1A73E8 !important;
-    }
-    .dashboard-card .card-label {
-        color: #5F6368 !important;
-        font-size: 1rem !important;
-        font-weight: 500 !important;
     }
 
     .stButton > button {
@@ -1219,79 +1050,6 @@ st.markdown("""
         margin-bottom: 2rem;
     }
 
-    .about-section {
-        background: #FFFFFF !important;
-        border: 1px solid #E8EAED;
-        border-radius: 16px;
-        padding: 2.5rem;
-        margin: 2rem 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.04);
-    }
-    .about-section h2 {
-        font-size: 2.5rem !important;
-        color: #1A73E8 !important;
-        margin-top: 2rem;
-        border-bottom: 3px solid #E8F0FE;
-        padding-bottom: 0.5rem;
-        font-weight: 700 !important;
-    }
-    .about-section h3 {
-        font-size: 1.8rem !important;
-        color: #1A73E8 !important;
-        margin-top: 1.5rem;
-        font-weight: 600 !important;
-    }
-    .about-section .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin: 1.5rem 0;
-    }
-    .about-section .stat-card {
-        background: #F8F9FA !important;
-        border: 1px solid #E8EAED;
-        border-radius: 12px;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s;
-    }
-    .about-section .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        border-color: #1A73E8;
-    }
-    .about-section .stat-card .number {
-        font-size: 3rem !important;
-        font-weight: 800 !important;
-        color: #1A73E8 !important;
-        display: block;
-    }
-    .about-section .stat-card .label {
-        font-size: 1.1rem !important;
-        color: #5F6368 !important;
-        font-weight: 500 !important;
-    }
-    .about-section .quote {
-        font-style: italic;
-        font-size: 1.4rem !important;
-        font-weight: 500 !important;
-        color: #1A73E8 !important;
-        text-align: center;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        border-top: 1px solid #E8EAED;
-        border-bottom: 1px solid #E8EAED;
-    }
-    .about-section .footer-credit {
-        text-align: center;
-        margin-top: 2.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #E8EAED;
-        color: #5F6368 !important;
-        font-size: 1rem !important;
-        font-weight: 400 !important;
-    }
-
     .letter-box {
         background: #FFFFFF !important;
         border: 2px solid #E8EAED;
@@ -1311,16 +1069,6 @@ st.markdown("""
         color: #1A73E8 !important;
         -webkit-text-fill-color: #1A73E8 !important;
     }
-    .letter-box .date {
-        text-align: right;
-        font-size: 1.1rem !important;
-        color: #5F6368 !important;
-    }
-    .letter-box .signature {
-        margin-top: 3rem;
-        border-top: 1px solid #E8EAED;
-        padding-top: 2rem;
-    }
 
     .css-1d391kg, .css-12w0qpk, [data-testid="stSidebar"] {
         background: #F8F9FA !important;
@@ -1334,14 +1082,8 @@ st.markdown("""
 # ===================================================================
 
 def is_celebration_period():
-    """
-    Approximate Ethiopian New Year celebration period:
-    Nehase 15 – Meskerem 20  (roughly Aug 21 – Sep 30 Gregorian).
-    Returns True if today is within that window.
-    """
     today = datetime.now()
     m, d = today.month, today.day
-    # Nehase 15 ~ Aug 21, Meskerem 20 ~ Sep 30
     if m == 8 and d >= 21:
         return True
     if m == 9 and d <= 30:
@@ -1349,7 +1091,6 @@ def is_celebration_period():
     return False
 
 def show_celebration_page():
-    """Display a full‑screen Ethiopian New Year celebration with balloons, flags, and a portal entry button."""
     st.markdown("""
     <style>
         .celebration-wrapper {
@@ -1483,13 +1224,6 @@ def show_celebration_page():
             text-shadow: 0 0 20px rgba(255,215,0,0.6);
             margin-top: 0.5rem;
         }
-        @media (max-width: 768px) {
-            .flag-container { width: 30vw; max-width: 150px; }
-            .celebration-title { font-size: 2.2rem; padding: 0.5rem 1rem; }
-            .celebration-subtitle { font-size: 1.4rem; }
-            .celebration-btn { font-size: 1.2rem; padding: 0.7rem 2rem; }
-            .boom-text { font-size: 1.4rem; }
-        }
     </style>
     """, unsafe_allow_html=True)
 
@@ -1510,8 +1244,6 @@ def show_celebration_page():
     html_content = f"""
     <div class="celebration-wrapper">
         {balloon_html}
-
-        <!-- Ethiopian Flags (slow movement) -->
         <div class="flag-container flag-left">
             <div class="flag-stripe green"></div>
             <div class="flag-stripe yellow"></div>
@@ -1522,7 +1254,6 @@ def show_celebration_page():
             <div class="flag-stripe yellow"></div>
             <div class="flag-stripe red"></div>
         </div>
-
         <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.2); z-index:5;"></div>
         <div class="celebration-content">
             <div class="flag-emojis">🇪🇹 🎉 🎊</div>
@@ -1539,12 +1270,9 @@ def show_celebration_page():
     </div>
     """
 
-    # ---- The secure way to inject raw HTML ----
     try:
-        # Streamlit >= 1.38 – direct HTML injection
         st.html(html_content)
     except AttributeError:
-        # Fallback to the deprecated but still working method
         st.components.v1.html(html_content, height=800, scrolling=False)
 
 # ===================================================================
@@ -2077,7 +1805,7 @@ RESEARCHER_PROFILES = {
             {"degree": "B.Sc. in Applied Mathematics", "institution": "Arba Minch University", "year": "2007"}
         ]
     },
-        "researcher_9": {
+    "researcher_9": {
         "id": "A009",
         "name": "Teketel Ketema",
         "title": "Researcher / PhD Candidate",
@@ -2142,7 +1870,7 @@ RESEARCHER_PROFILES = {
 }
    
 # ===================================================================
-# HELPER FUNCTIONS - ALL FULLY DEFINED
+# HELPER FUNCTIONS
 # ===================================================================
 
 def create_forum_post(title, content, author, tags=[]):
@@ -2396,392 +2124,564 @@ def show_chat():
                     st.error(f"Error sending message: {e}")
 
 def show_about_page():
-    html_content = """
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <style>
-            body {
-                background: #FFFFFF !important;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                margin: 0;
-                padding: 20px;
-                color: #202124 !important;
-                overflow-y: auto !important;
-                height: 100% !important;
-            }
-            .about-section {
-                background: #FFFFFF !important;
-                border: 1px solid #E8EAED;
-                border-radius: 16px;
-                padding: 2.5rem;
-                margin: 0;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-                color: #202124 !important;
-                max-height: none !important;
-                overflow: visible !important;
-            }
-            .about-header {
-                display: flex;
-                align-items: center;
-                gap: 20px;
-                margin-bottom: 1.5rem;
-                flex-wrap: wrap;
-            }
-            .about-header .back-btn {
-                background: #F8F9FA !important;
-                border: 1px solid #DADCE0 !important;
-                color: #202124 !important;
-                padding: 10px 20px;
-                border-radius: 30px;
-                cursor: pointer;
-                font-size: 1rem;
-                font-weight: 500;
-                transition: all 0.3s ease;
-                white-space: nowrap;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .about-header .back-btn:hover {
-                background: #E8F0FE !important;
-                border-color: #1A73E8 !important;
-                transform: translateX(-3px);
-            }
-            .about-header .back-btn .arrow {
-                display: inline-block;
-                transition: transform 0.3s ease;
-            }
-            .about-header .back-btn:hover .arrow {
-                transform: translateX(-3px);
-            }
-            .about-header h1 {
-                font-size: 2.8rem;
-                text-align: left;
-                background: linear-gradient(135deg, #1A73E8, #4285F4, #34A853);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                margin: 0;
-                flex: 1;
-                font-weight: 800 !important;
-            }
-            .about-section h2 {
-                font-size: 2.2rem;
-                color: #1A73E8 !important;
-                margin-top: 2rem;
-                border-bottom: 3px solid #E8F0FE;
-                padding-bottom: 0.5rem;
-                font-weight: 700 !important;
-            }
-            .about-section h3 {
-                font-size: 1.6rem;
-                color: #1A73E8 !important;
-                margin-top: 1.5rem;
-                font-weight: 600 !important;
-            }
-            .about-section .highlight-box {
-                background: #F8F9FA !important;
-                border-left: 4px solid #1A73E8;
-                padding: 1.5rem;
-                margin: 1rem 0;
-                border-radius: 8px;
-                color: #202124 !important;
-            }
-            .about-section .highlight-box p {
-                color: #202124 !important;
-                font-size: 1.2rem !important;
-                font-weight: 400 !important;
-            }
-            .about-section .stat-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-                gap: 20px;
-                margin: 1.5rem 0;
-            }
-            .about-section .stat-card {
-                background: #F8F9FA !important;
-                border: 1px solid #E8EAED;
-                border-radius: 12px;
-                padding: 1.5rem;
-                text-align: center;
-                transition: all 0.3s;
-                color: #202124 !important;
-            }
-            .about-section .stat-card:hover {
-                transform: translateY(-3px);
-                border-color: #1A73E8 !important;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            }
-            .about-section .stat-card .number {
-                font-size: 2.8rem;
-                font-weight: 800 !important;
-                color: #1A73E8 !important;
-                display: block;
-            }
-            .about-section .stat-card .label {
-                font-size: 1rem;
-                font-weight: 500 !important;
-                color: #5F6368 !important;
-            }
-            .about-section ul {
-                color: #202124 !important;
-                font-size: 1.1rem;
-                font-weight: 400 !important;
-                line-height: 2.2;
-                padding-left: 1.5rem;
-            }
-            .about-section ul li {
-                color: #202124 !important;
-            }
-            .about-section ul li b {
-                color: #202124 !important;
-                font-weight: 600 !important;
-            }
-            .about-section .quote {
-                font-style: italic;
-                font-size: 1.3rem;
-                font-weight: 500 !important;
-                color: #1A73E8 !important;
-                text-align: center;
-                padding: 1.5rem;
-                margin: 2rem 0;
-                border-top: 1px solid #E8EAED;
-                border-bottom: 1px solid #E8EAED;
-            }
-            .about-section .footer-credit {
-                text-align: center;
-                margin-top: 2.5rem;
-                padding-top: 1.5rem;
-                border-top: 1px solid #E8EAED;
-                color: #5F6368 !important;
-                font-size: 1rem;
-                font-weight: 400 !important;
-                font-style: italic;
-                letter-spacing: 0.5px;
-            }
-            .about-section .footer-credit .highlight-name {
-                color: #1A73E8 !important;
-                font-weight: 600 !important;
-            }
-            .about-section .footer-credit .highlight-institution {
-                color: #34A853 !important;
-                font-weight: 600 !important;
-            }
-            .about-section p {
-                color: #202124 !important;
-                font-size: 1.2rem !important;
-                font-weight: 400 !important;
-            }
-            .about-section span {
-                color: #202124 !important;
-            }
-            .about-section div {
-                color: #202124 !important;
-            }
-            
-            ::-webkit-scrollbar {
-                width: 10px;
-            }
-            ::-webkit-scrollbar-track {
-                background: #F8F9FA;
-                border-radius: 10px;
-            }
-            ::-webkit-scrollbar-thumb {
-                background: #1A73E8;
-                border-radius: 10px;
-            }
-            ::-webkit-scrollbar-thumb:hover {
-                background: #1557B0;
-            }
-            
-            @media (max-width: 768px) {
-                .about-header h1 {
-                    font-size: 1.8rem !important;
-                }
-                .about-section {
-                    padding: 1.5rem !important;
-                }
-                .about-section .stat-grid {
-                    grid-template-columns: 1fr 1fr;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div class="about-section">
-            <div class="about-header">
-                <a href="#" onclick="window.parent.location.reload(); return false;" class="back-btn">
-                    <span class="arrow">←</span> Back to Home
-                </a>
-                <h1> About This Portal</h1> 📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀
-            </div>
-            
-            <div class="highlight-box">
-                <p style="font-size:1.2rem; color:#202124 !important; font-weight:400 !important; margin: 0;">
-                    <b style="color:#1A73E8 !important; font-weight:700 !important;">🎯 OVERALL PURPOSE</b><br>
-                    The <b style="color:#1A73E8 !important; font-weight:700 !important;">Ethiopian Research Collaboration Portal</b> is a digital platform designed to 
-                    <b style="color:#34A853 !important; font-weight:600 !important;">bridge the gap</b> between Ethiopian researchers, academic professionals, 
-                    and students by facilitating <b style="color:#1A73E8 !important; font-weight:600 !important;">meaningful academic collaborations</b>.
-                </p>
-            </div>
-            
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <span class="number">9</span>
-                    <span class="label">👨‍🏫 Verified Professionals</span>
-                </div>
-                <div class="stat-card">
-                    <span class="number">10</span>
-                    <span class="label">🎓 Student Researchers</span>
-                </div>
-                <div class="stat-card">
-                    <span class="number">100+</span>
-                    <span class="label">📄 Publications</span>
-                </div>
-                <div class="stat-card">
-                    <span class="number">30+</span>
-                    <span class="label">🎯 PhDs Completed</span>
-                </div>
-            </div>
-            
-            <h2>📌 KEY IMPORTANCE &amp; BENEFITS</h2>
-            
-            <h3>1. 🌍 Connecting Ethiopian Researchers</h3>
-            <ul>
-                <li><b>Breaks down silos</b> between universities and institutions</li>
-                <li>Creates a <b>unified network</b> of Ethiopian academic professionals</li>
-                <li>Enables <b>cross-institutional collaboration</b></li>
-                <li>Promotes <b>knowledge sharing</b> across disciplines</li>
-            </ul>
-            
-            <h3>2. 🎓 Enhancing Research Supervision</h3>
-            <ul>
-                <li>PhD and MSc students can <b>find qualified supervisors</b></li>
-                <li>Matches students with <b>experts in their research field</b></li>
-                <li>Reduces the <b>time and effort</b> needed to find appropriate supervisors</li>
-                <li>Increases <b>student success rates</b> through proper guidance</li>
-            </ul>
-            
-            <h3>3. 🤝 Promoting Joint Research</h3>
-            <ul>
-                <li>Enables researchers to <b>find collaborators</b> with complementary expertise</li>
-                <li>Facilitates <b>interdisciplinary research projects</b></li>
-                <li>Increases <b>research output and publications</b></li>
-                <li>Strengthens <b>Ethiopia's research capacity</b></li>
-            </ul>
-            
-            <h3>4. 💼 Consultancy Opportunities</h3>
-            <ul>
-                <li>Connects <b>academic experts</b> with organizations needing consultancy</li>
-                <li>Enables <b>knowledge transfer</b> from academia to industry</li>
-                <li>Creates <b>income-generating opportunities</b> for academics</li>
-                <li>Supports <b>evidence-based decision making</b> in various sectors</li>
-            </ul>
-            
-            <h2>🔬 DISCIPLINES COVERED</h2>
-            <ul>
-                <li><b>🧮 Operations Research & Optimization</b> - Dr. Berhanu Mekonen</li>
-                <li><b>📊 Queuing Theory & Stochastic Processes</b> - Prof. Natesan Thillaigovindan</li>
-                <li><b>🧠 Systems Optimization & AI</b> - Dr. D.Sc. Abebe Geletu</li>
-                <li><b>📊 Metaheuristics & Data Science</b> - Dr. Surafel Luleseged Tilahun</li>
-                <li><b>📐 Numerical Analysis & PDEs</b> - Prof. Gemechis File Duressa</li>
-                <li><b>🔬 Food Microbiology & Biotechnology</b> - Dr. Addisu Fekadu Andeta</li>
-                <li><b>📐🚦 Hyperbolic Traffic Flow & Epidemiology</b> - Prof. Legesse Lemecha Obsu</li>
-                <li><b>🌿📊 Mathematical Bioeconomics</b> - Dr. Simon Derkee Zawka</li>
-            </ul>
-            
-            <h2>📈 SPECIFIC USES</h2>
-            
-            <h3>For <span style="color:#1A73E8 !important; font-weight:600 !important;">Students &amp; Researchers:</span></h3>
-            <ul>
-                <li>✅ Find <b>PhD/MSc supervisors</b></li>
-                <li>✅ Discover <b>research collaborators</b></li>
-                <li>✅ Get <b>expert consultancy</b></li>
-                <li>✅ Submit <b>formal collaboration requests</b></li>
-                <li>✅ Generate <b>professional request letters</b></li>
-            </ul>
-            
-            <h3>For <span style="color:#34A853 !important; font-weight:600 !important;">Academicians &amp; Professors:</span></h3>
-            <ul>
-                <li>✅ Showcase <b>expertise and research interests</b></li>
-                <li>✅ Find <b>supervisees</b></li>
-                <li>✅ Identify <b>joint research partners</b></li>
-                <li>✅ Offer <b>consultancy services</b></li>
-                <li>✅ Expand <b>professional network</b></li>
-            </ul>
-            
-            <h2>💡 ADVANCED FEATURES</h2>
-            
-            <h3>🔍 Smart Search</h3>
-            <ul>
-                <li>Search by <b>name, research area, institution, department, specialization, collaboration type, or keywords</b></li>
-                <li>Filter <b>available professionals only</b></li>
-            </ul>
-            
-            <h3>📝 Request Management</h3>
-            <ul>
-                <li>Submit <b>supervision, joint research, or consultancy requests</b></li>
-                <li>Track <b>request status</b> (Pending/Approved/Rejected)</li>
-                <li>Generate <b>formal request letters</b> automatically</li>
-                <li>Follow up with <b>email integration</b></li>
-            </ul>
-            
-            <h3>📊 Real-Time Dashboard</h3>
-            <ul>
-                <li>Live <b>status indicators</b></li>
-                <li>View <b>available slots</b> for each professional</li>
-                <li>See <b>completed PhDs</b> and <b>publications</b></li>
-            </ul>
-            
-            <h2>🎯 WHO BENEFITS?</h2>
-            <ul>
-                <li><b>PhD Students:</b> Find supervisors, get guidance</li>
-                <li><b>MSc Students:</b> Research collaboration, mentorship</li>
-                <li><b>Professors:</b> Supervise students, joint research</li>
-                <li><b>Researchers:</b> Collaborators, publications</li>
-                <li><b>Universities:</b> Research output, reputation</li>
-                <li><b>Ethiopia:</b> Knowledge economy, development</li>
-            </ul>
-            
-            <h2>📌 SUMMARY</h2>
-            <div class="highlight-box">
-                <p style="color:#202124 !important; font-size:1.2rem !important; font-weight:400 !important;">The <b style="color:#1A73E8 !important; font-weight:700 !important;">Ethiopian Research Collaboration Portal</b> is a <b style="color:#34A853 !important; font-weight:600 !important;">game-changer</b> for Ethiopian academia because it:</p>
-                <ul>
-                    <li>✅ <b>Connects</b> Ethiopian researchers across institutions</li>
-                    <li>✅ <b>Facilitates</b> research supervision and mentorship</li>
-                    <li>✅ <b>Promotes</b> joint research and publications</li>
-                    <li>✅ <b>Creates</b> consultancy opportunities</li>
-                    <li>✅ <b>Builds</b> research capacity in Ethiopia</li>
-                    <li>✅ <b>Strengthens</b> academic networks</li>
-                    <li>✅ <b>Drives</b> national development through research</li>
-                    <li>✅ <b>Showcases</b> Ethiopian academic excellence</li>
-                </ul>
-            </div>
-            
-            <div class="quote">
-                "The Research Collaboration Portal is not just a tool—it's a movement to transform 
-                Ethiopian research from isolated silos into a connected, collaborative, and globally 
-                competitive academic ecosystem."
-            </div>
-            
-            <div class="footer-credit">
-                🌿🇪🇹🎉 📚✍️🌍ኢትዮጲያ🕊️🎓🔥🚀 <span class="highlight-name">Berhanu Mekonen, PhD</span> · 
-                <span class="highlight-institution">Arba Minch University</span> · 
-                June 25, 2026
-            </div>
+    st.markdown("### 📖 About This Portal")
+    st.markdown("""
+    <div style="background:#F8F9FA;padding:2rem;border-radius:16px;border:1px solid #E8EAED;">
+        <h2>🌿 Ethiopian Research Collaboration Portal</h2>
+        <p><strong>Purpose:</strong> To bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
+        
+        <h3>🎯 Key Benefits</h3>
+        <ul>
+            <li><b>Connect</b> with verified researchers across Ethiopian universities</li>
+            <li><b>Find</b> PhD/MSc supervisors in your field</li>
+            <li><b>Collaborate</b> on joint research projects</li>
+            <li><b>Access</b> reading materials and resources</li>
+            <li><b>Share</b> research papers and publications</li>
+        </ul>
+        
+        <h3>👨‍🏫 Featured Researchers</h3>
+        <ul>
+            <li>🧮 Dr. Berhanu Mekonen - Operations Research & Optimization</li>
+            <li>📊 Prof. Natesan Thillaigovindan - Queuing Theory & Stochastic Processes</li>
+            <li>🧠 Dr. Abebe Geletu - Systems Optimization & AI</li>
+            <li>📐 Prof. Gemechis File - Numerical Analysis & PDEs</li>
+        </ul>
+        
+        <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #E8EAED;">
+            <p><em>Developed by Berhanu Mekonen, PhD · Arba Minch University · June 25, 2026</em></p>
         </div>
-    </body>
-    </html>
-    """
-    
-    st.components.v1.html(html_content, height=700, scrolling=True)
+    </div>
+    """, unsafe_allow_html=True)
     
     if st.button("🔙 Back to Main Portal", use_container_width=True):
         st.session_state.show_about = False
         st.rerun()
+
+# ===================================================================
+# USER READING MATERIALS PAGE
+# ===================================================================
+
+def show_user_reading_materials():
+    """User-facing page to view and access reading materials"""
+    
+    st.markdown("""
+    <div style="background:#E8F0FE;border:1px solid #1A73E8;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border-left:5px solid #1A73E8;">
+        <h3 style="color:#202124;margin:0;">📚 Reading Materials Library</h3>
+        <p style="color:#5F6368;margin:0.5rem 0 0 0;">Access research papers, textbooks, lecture notes, and other resources shared by the community</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Initialize reading materials in session state if not exists
+    if 'reading_materials' not in st.session_state:
+        st.session_state.reading_materials = []
+    
+    if not st.session_state.reading_materials:
+        st.info("📚 No reading materials available yet. Check back later for new resources!")
+        st.markdown("""
+        <div style="background:#F8F9FA;border:1px solid #E8EAED;border-radius:12px;padding:2rem;margin-top:1rem;text-align:center;">
+            <div style="font-size:3rem;">📖</div>
+            <h4 style="color:#1A73E8;">Coming Soon!</h4>
+            <p style="color:#5F6368;">The reading materials library is being populated with resources.<br>
+            Check back regularly for new materials from our researchers and faculty.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:1rem;">
+                <span style="background:#E8F0FE;padding:8px 20px;border-radius:25px;font-size:0.9rem;">📄 Research Papers</span>
+                <span style="background:#E6F4EA;padding:8px 20px;border-radius:25px;font-size:0.9rem;">📚 Textbooks</span>
+                <span style="background:#FFF3E0;padding:8px 20px;border-radius:25px;font-size:0.9rem;">📝 Lecture Notes</span>
+                <span style="background:#FCE8E6;padding:8px 20px;border-radius:25px;font-size:0.9rem;">🔬 Lab Manuals</span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        return
+    
+    # Search and filter
+    col1, col2, col3 = st.columns([2, 1.5, 1])
+    with col1:
+        search_query = st.text_input("🔍 Search Materials", placeholder="Search by title, author, category...")
+    with col2:
+        category_filter = st.selectbox("📂 Filter by Category", ["All Categories"] + sorted(set([m["category"] for m in st.session_state.reading_materials])))
+    with col3:
+        level_filter = st.selectbox("🎯 Filter by Level", ["All Levels"] + sorted(set([m["level"] for m in st.session_state.reading_materials])))
+    
+    # Filter materials
+    filtered_materials = st.session_state.reading_materials
+    
+    if search_query:
+        search_query = search_query.lower()
+        filtered_materials = [
+            m for m in filtered_materials 
+            if search_query in m["title"].lower() 
+            or search_query in m["author"].lower() 
+            or search_query in m["description"].lower()
+            or any(search_query in tag.lower() for tag in m.get("tags", []))
+            or any(search_query in kw.lower() for kw in m.get("keywords", []))
+        ]
+    
+    if category_filter != "All Categories":
+        filtered_materials = [m for m in filtered_materials if m["category"] == category_filter]
+    
+    if level_filter != "All Levels":
+        filtered_materials = [m for m in filtered_materials if m["level"] == level_filter]
+    
+    st.caption(f"📊 Found {len(filtered_materials)} material(s)")
+    
+    # Display materials in a grid
+    for material in filtered_materials:
+        with st.container():
+            st.markdown(f"""
+            <div style="background:#FFFFFF;border:1px solid #E8EAED;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                    <div style="flex:1;">
+                        <h4 style="color:#1A73E8;margin:0;">📄 {material['title']}</h4>
+                        <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
+                            <span style="background:#E8F0FE;color:#1A73E8;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['category']}</span>
+                            <span style="background:#FCE8E6;color:#EA4335;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['type']}</span>
+                            <span style="background:#E6F4EA;color:#34A853;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['level']}</span>
+                            <span style="background:#FFF3E0;color:#FB8C00;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['language']}</span>
+                        </div>
+                        <p style="color:#202124;margin:0.5rem 0;">{material['description']}</p>
+                        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:0.3rem;">
+                            <span style="color:#5F6368;font-size:0.8rem;">✍️ {material['author']}</span>
+                            <span style="color:#5F6368;font-size:0.8rem;">📅 {material['upload_date']}</span>
+                        </div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
+                            {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material.get('tags', [])[:5])}
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="background:#F8F9FA;color:#5F6368;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500;">ID: {material['id']}</span>
+                        <br>
+                        <span style="color:#5F6368;font-size:0.8rem;">👁️ {material.get('views', 0)} views</span>
+                        <br>
+                        <span style="color:#5F6368;font-size:0.8rem;">⬇️ {material.get('downloads', 0)} downloads</span>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Action buttons
+            col1, col2, col3 = st.columns([1, 1, 2])
+            
+            with col1:
+                if material.get('file_data'):
+                    material['downloads'] = material.get('downloads', 0) + 1
+                    st.download_button(
+                        label="⬇️ Download",
+                        data=material['file_data'],
+                        file_name=material['file_name'],
+                        mime=material['file_type'],
+                        key=f"download_{material['id']}",
+                        use_container_width=True
+                    )
+                elif material.get('external_link'):
+                    st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;text-align:center;width:100%;">🔗 Open Link</a>', unsafe_allow_html=True)
+            
+            with col2:
+                if st.button("👁️ View Details", key=f"view_{material['id']}", use_container_width=True):
+                    material['views'] = material.get('views', 0) + 1
+                    st.info(f"📄 **{material['title']}**\n\n{material['description']}\n\n📂 Category: {material['category']}\n🎯 Level: {material['level']}\n✍️ Author: {material['author']}")
+            
+            st.markdown("---")
+    
+    # Statistics section
+    if st.session_state.reading_materials:
+        st.markdown("### 📊 Library Statistics")
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("📚 Total Materials", len(st.session_state.reading_materials))
+        col2.metric("📂 Categories", len(set(m['category'] for m in st.session_state.reading_materials)))
+        col3.metric("⬇️ Total Downloads", sum(m.get('downloads', 0) for m in st.session_state.reading_materials))
+        col4.metric("👁️ Total Views", sum(m.get('views', 0) for m in st.session_state.reading_materials))
+
+# ===================================================================
+# ADMIN READING MATERIALS MANAGEMENT
+# ===================================================================
+
+def show_admin_reading_materials():
+    """Admin interface for uploading and managing reading materials"""
+    
+    st.markdown("""
+    <div style="background:#E8F0FE;border:1px solid #1A73E8;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border-left:5px solid #1A73E8;">
+        <h3 style="color:#202124;margin:0;">📚 Admin - Reading Materials Management</h3>
+        <p style="color:#5F6368;margin:0.5rem 0 0 0;">Upload, manage, and organize reading materials for students and researchers</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    if 'reading_materials' not in st.session_state:
+        st.session_state.reading_materials = []
+    if 'material_id_counter' not in st.session_state:
+        st.session_state.material_id_counter = 0
+    
+    tab1, tab2, tab3 = st.tabs(["📤 Upload Material", "📚 Manage Materials", "📊 Statistics"])
+    
+    with tab1:
+        st.markdown("### 📤 Upload New Reading Material")
         
+        with st.form("upload_material_form", clear_on_submit=True):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                material_title = st.text_input("📌 Material Title *", placeholder="e.g., Research Methodology Guide")
+                material_category = st.selectbox(
+                    "📂 Category *",
+                    ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", 
+                     "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", 
+                     "Reference Materials", "Study Guides", "Other"]
+                )
+                material_type = st.selectbox(
+                    "📄 Material Type *",
+                    ["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"]
+                )
+                material_level = st.selectbox(
+                    "🎯 Target Level *",
+                    ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"]
+                )
+            
+            with col2:
+                material_author = st.text_input("✍️ Author/Uploader *", value="Admin")
+                material_tags = st.text_input("🏷️ Tags (comma separated)", placeholder="e.g., research, methodology, statistics")
+                material_language = st.selectbox(
+                    "🌍 Language",
+                    ["English", "Amharic", "Both"]
+                )
+                material_access = st.selectbox(
+                    "🔒 Access Level",
+                    ["Public", "Registered Users Only", "Admin Only"]
+                )
+            
+            material_description = st.text_area("📝 Description *", height=100, placeholder="Brief description of the material...")
+            material_keywords = st.text_input("🔍 Keywords (comma separated)", placeholder="e.g., research methods, data analysis, SPSS")
+            
+            uploaded_file = st.file_uploader(
+                "📎 Upload File",
+                type=['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'csv', 'zip'],
+                help="Upload the reading material file (Max 200MB)"
+            )
+            
+            external_link = st.text_input("🔗 External Link", placeholder="https://... (if applicable)")
+            
+            if uploaded_file:
+                st.markdown("---")
+                st.markdown("#### 📄 File Preview")
+                file_extension = uploaded_file.name.split('.')[-1].lower() if uploaded_file.name else ''
+                
+                if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+                    st.image(uploaded_file, caption="File Preview", use_container_width=True)
+                elif file_extension == 'pdf':
+                    st.info("📄 PDF file ready for upload. Users can download and view it.")
+                elif file_extension in ['txt', 'csv']:
+                    try:
+                        content = uploaded_file.getvalue().decode('utf-8')
+                        st.text_area("Content Preview", content[:500] + ("..." if len(content) > 500 else ""), height=150, disabled=True)
+                    except:
+                        st.info("File content preview not available.")
+                else:
+                    st.info(f"📄 File type: {file_extension.upper()}. Ready for upload.")
+            
+            st.markdown("---")
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                submitted = st.form_submit_button("📤 Upload Material", use_container_width=True)
+            
+            if submitted:
+                if not material_title or not material_author or not material_category or not material_description:
+                    st.error("❌ Please fill in all required fields (Title, Author, Category, Description).")
+                elif not uploaded_file and not external_link:
+                    st.error("❌ Please upload a file or provide an external link.")
+                else:
+                    st.session_state.material_id_counter += 1
+                    material_id = f"MAT{st.session_state.material_id_counter:04d}"
+                    
+                    file_data = None
+                    file_name = None
+                    file_type = None
+                    file_size = None
+                    
+                    if uploaded_file:
+                        file_data = uploaded_file.getvalue()
+                        file_name = uploaded_file.name
+                        file_type = uploaded_file.type
+                        file_size = len(file_data)
+                    
+                    material = {
+                        "id": material_id,
+                        "title": material_title,
+                        "category": material_category,
+                        "type": material_type,
+                        "author": material_author,
+                        "description": material_description,
+                        "tags": [t.strip() for t in material_tags.split(",")] if material_tags else [],
+                        "keywords": [k.strip() for k in material_keywords.split(",")] if material_keywords else [],
+                        "level": material_level,
+                        "language": material_language,
+                        "access": material_access,
+                        "file_data": file_data,
+                        "file_name": file_name,
+                        "file_type": file_type,
+                        "file_size": file_size,
+                        "external_link": external_link,
+                        "upload_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        "uploaded_by": st.session_state.current_user,
+                        "downloads": 0,
+                        "views": 0,
+                        "approved": True
+                    }
+                    
+                    st.session_state.reading_materials.append(material)
+                    add_notification(f"📚 New reading material uploaded: {material_title}", "success")
+                    st.success(f"✅ Material '{material_title}' uploaded successfully! ID: {material_id}")
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+    
+    with tab2:
+        st.markdown("### 📚 Manage Reading Materials")
+        
+        if not st.session_state.reading_materials:
+            st.info("No materials uploaded yet. Use the 'Upload Material' tab to add resources.")
+            return
+        
+        col1, col2, col3 = st.columns([2, 1.5, 1])
+        with col1:
+            search_query = st.text_input("🔍 Search Materials", placeholder="Search by title, author, category...")
+        with col2:
+            category_filter = st.selectbox("📂 Filter by Category", ["All Categories"] + sorted(set([m["category"] for m in st.session_state.reading_materials])))
+        with col3:
+            level_filter = st.selectbox("🎯 Filter by Level", ["All Levels"] + sorted(set([m["level"] for m in st.session_state.reading_materials])))
+        
+        filtered_materials = st.session_state.reading_materials
+        
+        if search_query:
+            search_query = search_query.lower()
+            filtered_materials = [
+                m for m in filtered_materials 
+                if search_query in m["title"].lower() 
+                or search_query in m["author"].lower() 
+                or search_query in m["description"].lower()
+                or any(search_query in tag.lower() for tag in m["tags"])
+                or any(search_query in kw.lower() for kw in m["keywords"])
+            ]
+        
+        if category_filter != "All Categories":
+            filtered_materials = [m for m in filtered_materials if m["category"] == category_filter]
+        
+        if level_filter != "All Levels":
+            filtered_materials = [m for m in filtered_materials if m["level"] == level_filter]
+        
+        st.caption(f"📊 Found {len(filtered_materials)} material(s)")
+        
+        for material in filtered_materials:
+            with st.container():
+                st.markdown(f"""
+                <div style="background:#FFFFFF;border:1px solid #E8EAED;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+                        <div style="flex:1;">
+                            <h4 style="color:#1A73E8;margin:0;">{material['title']}</h4>
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
+                                <span style="background:#E8F0FE;color:#1A73E8;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['category']}</span>
+                                <span style="background:#FCE8E6;color:#EA4335;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['type']}</span>
+                                <span style="background:#E6F4EA;color:#34A853;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['level']}</span>
+                                <span style="background:#FFF3E0;color:#FB8C00;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['language']}</span>
+                                <span style="color:#5F6368;font-size:0.85rem;">📅 {material['upload_date']}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span style="background:#F8F9FA;color:#5F6368;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500;">ID: {material['id']}</span>
+                            <br>
+                            <span style="color:#5F6368;font-size:0.85rem;">👁️ {material.get('views', 0)} views</span>
+                            <span style="color:#5F6368;font-size:0.85rem;">⬇️ {material.get('downloads', 0)} downloads</span>
+                        </div>
+                    </div>
+                    <p style="color:#202124;margin:0.5rem 0;">{material['description']}</p>
+                    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
+                        {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material['tags'][:5])}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
+                
+                with col1:
+                    if material['file_data']:
+                        material['downloads'] = material.get('downloads', 0) + 1
+                        st.download_button(
+                            label="⬇️ Download",
+                            data=material['file_data'],
+                            file_name=material['file_name'],
+                            mime=material['file_type'],
+                            key=f"admin_download_{material['id']}"
+                        )
+                    elif material['external_link']:
+                        st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;">🔗 Open Link</a>', unsafe_allow_html=True)
+                
+                with col2:
+                    if st.button("📋 Edit", key=f"edit_{material['id']}"):
+                        st.session_state.edit_material_id = material['id']
+                        st.rerun()
+                
+                with col3:
+                    if st.button("🗑️ Delete", key=f"delete_{material['id']}"):
+                        st.session_state.reading_materials = [m for m in st.session_state.reading_materials if m['id'] != material['id']]
+                        add_notification(f"🗑️ Material '{material['title']}' deleted", "warning")
+                        st.success(f"✅ Material '{material['title']}' deleted successfully!")
+                        st.rerun()
+                
+                if st.session_state.get('edit_material_id') == material['id']:
+                    st.markdown("---")
+                    st.markdown("#### ✏️ Edit Material")
+                    
+                    with st.form(f"edit_form_{material['id']}"):
+                        edit_title = st.text_input("Title", value=material['title'])
+                        edit_category = st.selectbox("Category", ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"], 
+                            index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"].index(material['category']) if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] else 0)
+                        edit_description = st.text_area("Description", value=material['description'])
+                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material['tags']))
+                        edit_level = st.selectbox("Target Level", ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"], 
+                            index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] else 0)
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.form_submit_button("💾 Save Changes"):
+                                material['title'] = edit_title
+                                material['category'] = edit_category
+                                material['description'] = edit_description
+                                material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
+                                material['level'] = edit_level
+                                add_notification(f"📝 Material '{material['title']}' updated", "info")
+                                st.success("✅ Material updated successfully!")
+                                st.session_state.edit_material_id = None
+                                st.rerun()
+                        with col2:
+                            if st.form_submit_button("❌ Cancel"):
+                                st.session_state.edit_material_id = None
+                                st.rerun()
+                
+                st.markdown("---")
+    
+    with tab3:
+        st.markdown("### 📊 Reading Materials Statistics")
+        
+        if not st.session_state.reading_materials:
+            st.info("No materials uploaded yet.")
+            return
+        
+        total_materials = len(st.session_state.reading_materials)
+        total_downloads = sum(m.get('downloads', 0) for m in st.session_state.reading_materials)
+        total_views = sum(m.get('views', 0) for m in st.session_state.reading_materials)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("📚 Total Materials", total_materials)
+        col2.metric("⬇️ Total Downloads", total_downloads)
+        col3.metric("👁️ Total Views", total_views)
+        col4.metric("📂 Categories", len(set(m['category'] for m in st.session_state.reading_materials)))
+        
+        st.markdown("#### 📂 Materials by Category")
+        category_counts = Counter(m['category'] for m in st.session_state.reading_materials)
+        df_categories = pd.DataFrame({
+            'Category': list(category_counts.keys()),
+            'Count': list(category_counts.values())
+        })
+        if not df_categories.empty:
+            fig = px.bar(df_categories, x='Category', y='Count', title='Materials by Category', color='Count', color_continuous_scale='Blues')
+            fig.update_layout(height=400)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        st.markdown("#### 🎯 Materials by Target Level")
+        level_counts = Counter(m['level'] for m in st.session_state.reading_materials)
+        df_levels = pd.DataFrame({
+            'Level': list(level_counts.keys()),
+            'Count': list(level_counts.values())
+        })
+        if not df_levels.empty:
+            fig2 = px.pie(df_levels, values='Count', names='Level', title='Materials by Target Level', color_discrete_sequence=px.colors.sequential.Greens_r)
+            fig2.update_layout(height=400)
+            st.plotly_chart(fig2, use_container_width=True)
+
+# ===================================================================
+# ADMIN PANEL
+# ===================================================================
+
+def show_admin_panel():
+    st.markdown("### 👨‍💼 Admin Dashboard")
+    
+    tab1, tab2, tab3 = st.tabs(["👥 User Management", "📚 Reading Materials", "📊 System Stats"])
+    
+    with tab1:
+        st.markdown("#### 👥 User Registration Management")
+        
+        pending = [p for p in st.session_state.pending_users if not p['approved'] and not p['rejected']]
+        if pending:
+            st.markdown(f"##### 📌 Pending Registration Requests ({len(pending)})")
+            for i, req in enumerate(pending):
+                with st.expander(f"Request from {req['full_name']} ({req['username']}) - {req['request_date']}"):
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        st.markdown(f"""
+                        **Full Name:** {req['full_name']}  
+                        **Username:** {req['username']}  
+                        **Affiliation:** {req['affiliation']}  
+                        **Status:** {req['status']}  
+                        **Position:** {req.get('position', 'N/A')}  
+                        **Department:** {req['department']}  
+                        """)
+                    with col2:
+                        st.markdown(f"""
+                        **Student Level:** {req.get('student_level', 'N/A')}  
+                        **Nationality:** {req['nationality']}  
+                        **Request Date:** {req['request_date']}  
+                        **Additional Info:** {req.get('other_fields', 'None')}  
+                        """)
+                    col_a, col_b = st.columns(2)
+                    with col_a:
+                        if st.button(f"✅ Approve", key=f"approve_{i}"):
+                            success, msg = approve_user(i)
+                            if success:
+                                st.success(msg)
+                                st.balloons()
+                                time.sleep(0.5)
+                                st.rerun()
+                            else:
+                                st.error(msg)
+                    with col_b:
+                        if st.button(f"❌ Reject", key=f"reject_{i}"):
+                            success, msg = reject_user(i)
+                            if success:
+                                st.warning(msg)
+                                st.rerun()
+                            else:
+                                st.error(msg)
+        else:
+            st.info("No pending registration requests.")
+        
+        approved = [p for p in st.session_state.pending_users if p.get('approved')]
+        rejected = [p for p in st.session_state.pending_users if p.get('rejected')]
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Total Registered Users", len(st.session_state.user_db) - 1)
+        col2.metric("Pending Requests", len(pending))
+        col3.metric("Approved", len(approved))
+        col4.metric("Rejected", len(rejected))
+        
+        st.markdown("#### 👥 All Approved Users")
+        users = [u for u in st.session_state.user_db.keys() if u != 'admin']
+        if users:
+            df_users = pd.DataFrame({
+                "Username": users,
+                "Name": [st.session_state.user_profiles.get(u, {}).get('name', 'N/A') for u in users],
+                "Affiliation": [st.session_state.user_profiles.get(u, {}).get('affiliation', 'N/A') for u in users],
+                "Status": [st.session_state.user_profiles.get(u, {}).get('status', 'N/A') for u in users]
+            })
+            st.dataframe(df_users, use_container_width=True)
+        else:
+            st.info("No approved users yet.")
+    
+    with tab2:
+        show_admin_reading_materials()
+    
+    with tab3:
+        st.markdown("#### 📊 System Statistics")
+        col1, col2, col3 = st.columns(3)
+        col1.metric("Total Users", len(st.session_state.user_db))
+        col2.metric("Total Materials", len(st.session_state.reading_materials))
+        col3.metric("Total Forum Posts", len(st.session_state.forum_posts))
+
 # ===================================================================
 # LOAD DATA, SEARCH, LETTER GENERATION
 # ===================================================================
@@ -2882,7 +2782,7 @@ def show_login_page():
     init_user_db()
     st.markdown("""
     <div style="text-align:center; padding:1rem 0;">
-        <div style="font-size:4rem; margin-bottom:0.5rem;">📚✍️🌍ET <span style="color: #078930;">ኢ</span><span style="color: #FCDD09;">ት</span><span style="color: #DA121A;">ዮ</span><span style="color: #078930;">ጲ</span><span style="color: #FCDD09;">ያ</span>🕊️🎓🚀</</div>
+        <div style="font-size:4rem; margin-bottom:0.5rem;">📚✍️🌍ET <span style="color: #078930;">ኢ</span><span style="color: #FCDD09;">ት</span><span style="color: #DA121A;">ዮ</span><span style="color: #078930;">ጲ</span><span style="color: #FCDD09;">ያ</span>🕊️🎓🚀</div>
         <h1 style="font-size:3rem; margin:0;">Research Collaboration Portal</h1>
         <p style="color:#5F6368; font-size:1.2rem; margin-top:0.5rem;">🌿🇪🇹🎉Sign in to access the Ethiopian Research Network📚✍️🌍ኢትዮጲያ🕊️🎓🚀</p>
         <p style="color:#5F6368; font-size:1rem; margin-top:0.3rem;">Please register first if you don't have an account✍️🌍</p>
@@ -2967,443 +2867,22 @@ def show_login_page():
             st.markdown('</div>', unsafe_allow_html=True)
 
 # ===================================================================
-# READING MATERIALS MANAGEMENT - ADMIN SECTION
-# ===================================================================
-
-def show_admin_reading_materials():
-    """Admin interface for uploading and managing reading materials"""
-    
-    st.markdown("""
-    <div style="background:#E8F0FE;border:1px solid #1A73E8;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;border-left:5px solid #1A73E8;">
-        <h3 style="color:#202124;margin:0;">📚 Admin - Reading Materials Management</h3>
-        <p style="color:#5F6368;margin:0.5rem 0 0 0;">Upload, manage, and organize reading materials for students and researchers</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Initialize reading materials in session state if not exists
-    if 'reading_materials' not in st.session_state:
-        st.session_state.reading_materials = []
-    if 'material_id_counter' not in st.session_state:
-        st.session_state.material_id_counter = 0
-    
-    tab1, tab2, tab3 = st.tabs(["📤 Upload Material", "📚 Manage Materials", "📊 Statistics"])
-    
-    # ==================== TAB 1: UPLOAD ====================
-    with tab1:
-        st.markdown("### 📤 Upload New Reading Material")
-        
-        with st.form("upload_material_form", clear_on_submit=True):
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                material_title = st.text_input("📌 Material Title *", placeholder="e.g., Research Methodology Guide")
-                material_category = st.selectbox(
-                    "📂 Category *",
-                    ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", 
-                     "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", 
-                     "Reference Materials", "Study Guides", "Other"]
-                )
-                material_type = st.selectbox(
-                    "📄 Material Type *",
-                    ["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"]
-                )
-                material_level = st.selectbox(
-                    "🎯 Target Level *",
-                    ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"]
-                )
-            
-            with col2:
-                material_author = st.text_input("✍️ Author/Uploader *", value="Admin")
-                material_tags = st.text_input("🏷️ Tags (comma separated)", placeholder="e.g., research, methodology, statistics")
-                material_language = st.selectbox(
-                    "🌍 Language",
-                    ["English", "Amharic", "Both"]
-                )
-                material_access = st.selectbox(
-                    "🔒 Access Level",
-                    ["Public", "Registered Users Only", "Admin Only"]
-                )
-            
-            material_description = st.text_area("📝 Description *", height=100, placeholder="Brief description of the material...")
-            material_keywords = st.text_input("🔍 Keywords (comma separated)", placeholder="e.g., research methods, data analysis, SPSS")
-            
-            uploaded_file = st.file_uploader(
-                "📎 Upload File",
-                type=['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'csv', 'zip'],
-                help="Upload the reading material file (Max 200MB)"
-            )
-            
-            external_link = st.text_input("🔗 External Link", placeholder="https://... (if applicable)")
-            
-            # Preview section
-            if uploaded_file:
-                st.markdown("---")
-                st.markdown("#### 📄 File Preview")
-                file_extension = uploaded_file.name.split('.')[-1].lower() if uploaded_file.name else ''
-                
-                if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
-                    st.image(uploaded_file, caption="File Preview", use_container_width=True)
-                elif file_extension == 'pdf':
-                    st.info("📄 PDF file ready for upload. Users can download and view it.")
-                elif file_extension in ['txt', 'csv']:
-                    try:
-                        content = uploaded_file.getvalue().decode('utf-8')
-                        st.text_area("Content Preview", content[:500] + ("..." if len(content) > 500 else ""), height=150, disabled=True)
-                    except:
-                        st.info("File content preview not available.")
-                else:
-                    st.info(f"📄 File type: {file_extension.upper()}. Ready for upload.")
-            
-            st.markdown("---")
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                submitted = st.form_submit_button("📤 Upload Material", use_container_width=True)
-            
-            if submitted:
-                if not material_title or not material_author or not material_category or not material_description:
-                    st.error("❌ Please fill in all required fields (Title, Author, Category, Description).")
-                elif not uploaded_file and not external_link:
-                    st.error("❌ Please upload a file or provide an external link.")
-                else:
-                    # Generate unique ID
-                    st.session_state.material_id_counter += 1
-                    material_id = f"MAT{st.session_state.material_id_counter:04d}"
-                    
-                    # Save file if uploaded
-                    file_data = None
-                    file_name = None
-                    file_type = None
-                    file_size = None
-                    
-                    if uploaded_file:
-                        file_data = uploaded_file.getvalue()
-                        file_name = uploaded_file.name
-                        file_type = uploaded_file.type
-                        file_size = len(file_data)
-                    
-                    # Create material entry
-                    material = {
-                        "id": material_id,
-                        "title": material_title,
-                        "category": material_category,
-                        "type": material_type,
-                        "author": material_author,
-                        "description": material_description,
-                        "tags": [t.strip() for t in material_tags.split(",")] if material_tags else [],
-                        "keywords": [k.strip() for k in material_keywords.split(",")] if material_keywords else [],
-                        "level": material_level,
-                        "language": material_language,
-                        "access": material_access,
-                        "file_data": file_data,
-                        "file_name": file_name,
-                        "file_type": file_type,
-                        "file_size": file_size,
-                        "external_link": external_link,
-                        "upload_date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-                        "uploaded_by": st.session_state.current_user,
-                        "downloads": 0,
-                        "views": 0,
-                        "approved": True
-                    }
-                    
-                    st.session_state.reading_materials.append(material)
-                    add_notification(f"📚 New reading material uploaded: {material_title}", "success")
-                    st.success(f"✅ Material '{material_title}' uploaded successfully! ID: {material_id}")
-                    st.balloons()
-                    time.sleep(1)
-                    st.rerun()
-    
-    # ==================== TAB 2: MANAGE ====================
-    with tab2:
-        st.markdown("### 📚 Manage Reading Materials")
-        
-        if not st.session_state.reading_materials:
-            st.info("No materials uploaded yet. Use the 'Upload Material' tab to add resources.")
-            return
-        
-        # Search and filter
-        col1, col2, col3 = st.columns([2, 1.5, 1])
-        with col1:
-            search_query = st.text_input("🔍 Search Materials", placeholder="Search by title, author, category...")
-        with col2:
-            category_filter = st.selectbox("📂 Filter by Category", ["All Categories"] + sorted(set([m["category"] for m in st.session_state.reading_materials])))
-        with col3:
-            level_filter = st.selectbox("🎯 Filter by Level", ["All Levels"] + sorted(set([m["level"] for m in st.session_state.reading_materials])))
-        
-        # Filter materials
-        filtered_materials = st.session_state.reading_materials
-        
-        if search_query:
-            search_query = search_query.lower()
-            filtered_materials = [
-                m for m in filtered_materials 
-                if search_query in m["title"].lower() 
-                or search_query in m["author"].lower() 
-                or search_query in m["description"].lower()
-                or any(search_query in tag.lower() for tag in m["tags"])
-                or any(search_query in kw.lower() for kw in m["keywords"])
-            ]
-        
-        if category_filter != "All Categories":
-            filtered_materials = [m for m in filtered_materials if m["category"] == category_filter]
-        
-        if level_filter != "All Levels":
-            filtered_materials = [m for m in filtered_materials if m["level"] == level_filter]
-        
-        st.caption(f"📊 Found {len(filtered_materials)} material(s)")
-        
-        # Display materials
-        for material in filtered_materials:
-            with st.container():
-                st.markdown(f"""
-                <div style="background:#FFFFFF;border:1px solid #E8EAED;border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-                    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
-                        <div style="flex:1;">
-                            <h4 style="color:#1A73E8;margin:0;">{material['title']}</h4>
-                            <div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;">
-                                <span style="background:#E8F0FE;color:#1A73E8;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['category']}</span>
-                                <span style="background:#FCE8E6;color:#EA4335;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['type']}</span>
-                                <span style="background:#E6F4EA;color:#34A853;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['level']}</span>
-                                <span style="background:#FFF3E0;color:#FB8C00;padding:2px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">{material['language']}</span>
-                                <span style="color:#5F6368;font-size:0.85rem;">📅 {material['upload_date']}</span>
-                            </div>
-                        </div>
-                        <div>
-                            <span style="background:#F8F9FA;color:#5F6368;padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500;">ID: {material['id']}</span>
-                            <br>
-                            <span style="color:#5F6368;font-size:0.85rem;">👁️ {material.get('views', 0)} views</span>
-                            <span style="color:#5F6368;font-size:0.85rem;">⬇️ {material.get('downloads', 0)} downloads</span>
-                        </div>
-                    </div>
-                    <p style="color:#202124;margin:0.5rem 0;">{material['description']}</p>
-                    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
-                        {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material['tags'][:5])}
-                    </div>
-                </div>
-                """, unsafe_allow_html=True)
-                
-                # Action buttons
-                col1, col2, col3, col4 = st.columns([1, 1, 1, 2])
-                
-                with col1:
-                    if material['file_data']:
-                        material['downloads'] = material.get('downloads', 0) + 1
-                        st.download_button(
-                            label="⬇️ Download",
-                            data=material['file_data'],
-                            file_name=material['file_name'],
-                            mime=material['file_type'],
-                            key=f"admin_download_{material['id']}"
-                        )
-                    elif material['external_link']:
-                        st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;">🔗 Open Link</a>', unsafe_allow_html=True)
-                
-                with col2:
-                    if st.button("📋 Edit", key=f"edit_{material['id']}"):
-                        st.session_state.edit_material_id = material['id']
-                        st.rerun()
-                
-                with col3:
-                    if st.button("🗑️ Delete", key=f"delete_{material['id']}"):
-                        st.session_state.reading_materials = [m for m in st.session_state.reading_materials if m['id'] != material['id']]
-                        add_notification(f"🗑️ Material '{material['title']}' deleted", "warning")
-                        st.success(f"✅ Material '{material['title']}' deleted successfully!")
-                        st.rerun()
-                
-                # Edit mode
-                if st.session_state.get('edit_material_id') == material['id']:
-                    st.markdown("---")
-                    st.markdown("#### ✏️ Edit Material")
-                    
-                    with st.form(f"edit_form_{material['id']}"):
-                        edit_title = st.text_input("Title", value=material['title'])
-                        edit_category = st.selectbox("Category", ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"], index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"].index(material['category']) if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] else 0)
-                        edit_description = st.text_area("Description", value=material['description'])
-                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material['tags']))
-                        edit_level = st.selectbox("Target Level", ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"], index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] else 0)
-                        
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            if st.form_submit_button("💾 Save Changes"):
-                                material['title'] = edit_title
-                                material['category'] = edit_category
-                                material['description'] = edit_description
-                                material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
-                                material['level'] = edit_level
-                                add_notification(f"📝 Material '{material['title']}' updated", "info")
-                                st.success("✅ Material updated successfully!")
-                                st.session_state.edit_material_id = None
-                                st.rerun()
-                        with col2:
-                            if st.form_submit_button("❌ Cancel"):
-                                st.session_state.edit_material_id = None
-                                st.rerun()
-                
-                st.markdown("---")
-    
-    # ==================== TAB 3: STATISTICS ====================
-    with tab3:
-        st.markdown("### 📊 Reading Materials Statistics")
-        
-        if not st.session_state.reading_materials:
-            st.info("No materials uploaded yet.")
-            return
-        
-        # Summary stats
-        total_materials = len(st.session_state.reading_materials)
-        total_downloads = sum(m.get('downloads', 0) for m in st.session_state.reading_materials)
-        total_views = sum(m.get('views', 0) for m in st.session_state.reading_materials)
-        
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("📚 Total Materials", total_materials)
-        col2.metric("⬇️ Total Downloads", total_downloads)
-        col3.metric("👁️ Total Views", total_views)
-        col4.metric("📂 Categories", len(set(m['category'] for m in st.session_state.reading_materials)))
-        
-        # Category distribution
-        st.markdown("#### 📂 Materials by Category")
-        category_counts = Counter(m['category'] for m in st.session_state.reading_materials)
-        df_categories = pd.DataFrame({
-            'Category': list(category_counts.keys()),
-            'Count': list(category_counts.values())
-        })
-        fig = px.bar(df_categories, x='Category', y='Count', title='Materials by Category', color='Count', color_continuous_scale='Blues')
-        fig.update_layout(height=400)
-        st.plotly_chart(fig, use_container_width=True)
-        
-        # Level distribution
-        st.markdown("#### 🎯 Materials by Target Level")
-        level_counts = Counter(m['level'] for m in st.session_state.reading_materials)
-        df_levels = pd.DataFrame({
-            'Level': list(level_counts.keys()),
-            'Count': list(level_counts.values())
-        })
-        fig2 = px.pie(df_levels, values='Count', names='Level', title='Materials by Target Level', color_discrete_sequence=px.colors.sequential.Greens_r)
-        fig2.update_layout(height=400)
-        st.plotly_chart(fig2, use_container_width=True)
-        
-        # Most downloaded
-        st.markdown("#### ⬇️ Most Downloaded Materials")
-        sorted_by_downloads = sorted(st.session_state.reading_materials, key=lambda x: x.get('downloads', 0), reverse=True)[:10]
-        if sorted_by_downloads:
-            df_downloads = pd.DataFrame({
-                'Title': [m['title'][:30] + '...' if len(m['title']) > 30 else m['title'] for m in sorted_by_downloads],
-                'Downloads': [m.get('downloads', 0) for m in sorted_by_downloads],
-                'Category': [m['category'] for m in sorted_by_downloads]
-            })
-            fig3 = px.bar(df_downloads, x='Title', y='Downloads', title='Most Downloaded Materials', color='Category', text='Downloads')
-            fig3.update_layout(height=400, xaxis_tickangle=-45)
-            st.plotly_chart(fig3, use_container_width=True)
-        else:
-            st.info("No download data available yet.")
-
-# ===================================================================
-# ADMIN PANEL - UPDATED WITH TABS
-# ===================================================================
-
-def show_admin_panel():
-    st.markdown("### 👨‍💼 Admin Dashboard")
-    
-    # Admin tabs
-    tab1, tab2, tab3 = st.tabs(["👥 User Management", "📚 Reading Materials", "📊 System Stats"])
-    
-    with tab1:
-        st.markdown("#### 👥 User Registration Management")
-        
-        pending = [p for p in st.session_state.pending_users if not p['approved'] and not p['rejected']]
-        if pending:
-            st.markdown(f"##### 📌 Pending Registration Requests ({len(pending)})")
-            for i, req in enumerate(pending):
-                with st.expander(f"Request from {req['full_name']} ({req['username']}) - {req['request_date']}"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown(f"""
-                        **Full Name:** {req['full_name']}  
-                        **Username:** {req['username']}  
-                        **Affiliation:** {req['affiliation']}  
-                        **Status:** {req['status']}  
-                        **Position:** {req.get('position', 'N/A')}  
-                        **Department:** {req['department']}  
-                        """)
-                    with col2:
-                        st.markdown(f"""
-                        **Student Level:** {req.get('student_level', 'N/A')}  
-                        **Nationality:** {req['nationality']}  
-                        **Request Date:** {req['request_date']}  
-                        **Additional Info:** {req.get('other_fields', 'None')}  
-                        """)
-                    col_a, col_b = st.columns(2)
-                    with col_a:
-                        if st.button(f"✅ Approve", key=f"approve_{i}"):
-                            success, msg = approve_user(i)
-                            if success:
-                                st.success(msg)
-                                st.balloons()
-                                time.sleep(0.5)
-                                st.rerun()
-                            else:
-                                st.error(msg)
-                    with col_b:
-                        if st.button(f"❌ Reject", key=f"reject_{i}"):
-                            success, msg = reject_user(i)
-                            if success:
-                                st.warning(msg)
-                                st.rerun()
-                            else:
-                                st.error(msg)
-        else:
-            st.info("No pending registration requests.")
-        
-        approved = [p for p in st.session_state.pending_users if p.get('approved')]
-        rejected = [p for p in st.session_state.pending_users if p.get('rejected')]
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Total Registered Users", len(st.session_state.user_db) - 1)
-        col2.metric("Pending Requests", len(pending))
-        col3.metric("Approved", len(approved))
-        col4.metric("Rejected", len(rejected))
-        
-        st.markdown("#### 👥 All Approved Users")
-        users = [u for u in st.session_state.user_db.keys() if u != 'admin']
-        if users:
-            df_users = pd.DataFrame({
-                "Username": users,
-                "Name": [st.session_state.user_profiles.get(u, {}).get('name', 'N/A') for u in users],
-                "Affiliation": [st.session_state.user_profiles.get(u, {}).get('affiliation', 'N/A') for u in users],
-                "Status": [st.session_state.user_profiles.get(u, {}).get('status', 'N/A') for u in users]
-            })
-            st.dataframe(df_users, use_container_width=True)
-        else:
-            st.info("No approved users yet.")
-    
-    with tab2:
-        show_admin_reading_materials()
-    
-    with tab3:
-        st.markdown("#### 📊 System Statistics")
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Total Users", len(st.session_state.user_db))
-        col2.metric("Total Materials", len(st.session_state.reading_materials))
-        col3.metric("Total Forum Posts", len(st.session_state.forum_posts))
-
-# ===================================================================
 # MAIN APPLICATION
 # ===================================================================
 
 def main():
-    st.cache_data.clear()   # <--- ADD THIS LINE HERE
+    st.cache_data.clear()
     init_user_db()
 
-    # ---- Handle celebration dismissal via query param ----
     if st.query_params.get("celebration_dismissed"):
         st.session_state.celebration_dismissed = True
         st.query_params.clear()
         st.rerun()
 
     if not st.session_state.logged_in:
-        # Check for Ethiopian New Year celebration period
         if is_celebration_period() and not st.session_state.get("celebration_dismissed", False):
             show_celebration_page()
-            return   # stop further rendering; the page is fully occupied
+            return
         else:
             show_login_page()
             return
@@ -3441,9 +2920,9 @@ def main():
 
         unread = len([n for n in st.session_state.notifications if not n.get('read', False)])
         if is_admin:
-            nav_options = ["👑 Admin Dashboard", "🏠 Home", "🔍 Find Researchers", "💬 Forum", "📊 Analytics", "📋 My Requests", "💬 Chat", "📅 Events", "💰 Grants", "👥 Mentorship", "📄 Papers", "📝 Feedback", "👤 Profile"]
+            nav_options = ["👑 Admin Dashboard", "🏠 Home", "🔍 Find Researchers", "💬 Forum", "📊 Analytics", "📋 My Requests", "💬 Chat", "📅 Events", "💰 Grants", "👥 Mentorship", "📄 Papers", "📚 Reading Materials", "📝 Feedback", "👤 Profile"]
         else:
-            nav_options = ["🏠 Home", "🔍 Find Researchers", "💬 Forum", "📊 Analytics", "📋 My Requests", "💬 Chat", "📅 Events", "💰 Grants", "👥 Mentorship", "📄 Papers", "📝 Feedback", "👤 Profile"]
+            nav_options = ["🏠 Home", "🔍 Find Researchers", "💬 Forum", "📊 Analytics", "📋 My Requests", "💬 Chat", "📅 Events", "💰 Grants", "👥 Mentorship", "📄 Papers", "📚 Reading Materials", "📝 Feedback", "👤 Profile"]
         if unread > 0:
             nav_options.append(f"📨 Notifications <span class='notification-badge'>{unread}</span>")
         else:
@@ -3827,6 +3306,7 @@ def main():
         if st.session_state.mentorships:
             for m in st.session_state.mentorships:
                 st.markdown(f"<div style='background:#F8F9FA;padding:1rem;border-radius:12px;margin-bottom:0.5rem;'><strong>{m['mentor']}</strong> · Expertise: {m['expertise']} · {m['availability']}</div>", unsafe_allow_html=True)
+    
     elif current_page == "📄 Papers":
         st.markdown("### 📄 Research Paper Sharing")
         with st.expander("📤 Upload a Paper", expanded=False):
@@ -3854,6 +3334,10 @@ def main():
                         st.error(f"Error uploading: {e}")
         for p in reversed(st.session_state.papers):
             st.markdown(f"<div style='background:#FFFFFF;border:1px solid #E8EAED;border-radius:12px;padding:1rem;margin-bottom:0.5rem;'><strong>{p['title']}</strong><br>Authors: {p['authors']}<br>{p['abstract'][:200]}...<br><span style='color:#5F6368;'>Uploaded by {p['uploaded_by']} on {p['date']}</span></div>", unsafe_allow_html=True)
+    
+    elif current_page == "📚 Reading Materials":
+        show_user_reading_materials()
+    
     elif current_page == "📝 Feedback":
         st.markdown("### 📝 Feedback & Suggestions")
         with st.form("feedback_form"):
@@ -3880,6 +3364,7 @@ def main():
         for fb in reversed(st.session_state.feedback[-5:]):
             stars = "⭐" * fb['rating']
             st.markdown(f"<div class='feedback-item'><div class='feedback-header'><strong>{fb['username']}</strong><span class='feedback-rating'>{stars}</span></div><p>{fb['comment']}</p><span style='color:#5F6368;font-size:0.8rem;'>{fb['date']}</span></div>", unsafe_allow_html=True)
+    
     elif current_page == "👤 Profile":
         st.markdown("### 👤 My Profile")
         profile = st.session_state.user_profiles.get(st.session_state.current_user, {})
@@ -3896,6 +3381,7 @@ def main():
             <div><strong>Badges:</strong> {', '.join(st.session_state.user_badges.get(st.session_state.current_user, [])) or 'None yet'}</div>
         </div>
         """, unsafe_allow_html=True)
+    
     elif "📨 Notifications" in current_page:
         show_notification_center()
 
