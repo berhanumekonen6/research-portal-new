@@ -2093,10 +2093,10 @@ RESEARCHER_PROFILES = {
             "Applications of First Order Ordinary Differential Equation as Mathematical Model (2020) - Computational Mathematics and Modeling",
             "Applications of First Order Ordinary Differential Equation as Mathematical Model (2020) - Preprint"
         ],
-        "supervisory_capacity": null,
-        "current_students": null,
+        "supervisory_capacity": None,
+        "current_students": None,
         "completed_phds": 0,
-        "available_for_collaboration": true,
+        "available_for_collaboration": True,
         "collaboration_types": ["Joint Research", "Research Supervision"],
         "phd_students_completed": [],
         "email": "teketel.ketema@mekdelaamu.edu.et",
