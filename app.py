@@ -2605,8 +2605,7 @@ def show_about_page():
                 <a href="#" onclick="window.parent.location.reload(); return false;" class="back-btn">
                     <span class="arrow">←</span> Back to Home
                 </a>
-                <h1> About This Portal</h1>  
-                📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀
+                <h1> About This Portal</h1> 📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀
             </div>
             
             <div class="highlight-box">
