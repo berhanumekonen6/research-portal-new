@@ -2066,6 +2066,68 @@ RESEARCHER_PROFILES = {
             {"degree": "M.Sc. in Mathematics", "institution": "Addis Ababa University", "year": "2010"},
             {"degree": "B.Sc. in Applied Mathematics", "institution": "Arba Minch University", "year": "2007"}
         ]
+    },
+        "researcher_9": {
+        "id": "A009",
+        "name": "Dr. Teketel Ketema",
+        "title": "Researcher / PhD Candidate",
+        "institution": "Mekdela Amba University",
+        "department": "Department of Mathematics",
+        "education": "Ph.D. in Mathematics (Ongoing), Arba Minch University",
+        "profile_image": "🤖📊🧮",
+        "research_interests": "Deep Learning, Optimal Control, Predictive Modeling, Simulation, Data Analytics, Data-Driven Predictive Control Systems, Koopman Operator Theory, Machine Repair Systems, Queuing Theory, Ordinary Differential Equations, Reachability Analysis",
+        "research_keywords": ["Deep Learning", "Optimal Control", "Predictive Modeling", "Simulation", "Data Analytics", "Koopman Theory", "Queueing Systems", "Machine Repair", "Reachability Analysis"],
+        "specializations": [
+            {"area": "Deep Learning", "level": 5},
+            {"area": "Optimal Control", "level": 4},
+            {"area": "Predictive Modeling", "level": 4},
+            {"area": "Data Analytics", "level": 4},
+            {"area": "Queuing Theory", "level": 4},
+            {"area": "Simulation", "level": 3}
+        ],
+        "publications": [
+            "Chance-constrained reachability analysis for data-driven predictive control of unknown nonlinear systems (2026) - Kybernetika, 62(2), 305-331",
+            "Deep Koopman-based reachability analysis for data-driven predictive control of unknown nonlinear systems (2025) - IFAC Journal of Systems and Control, 100339",
+            "Performance Analysis of Machine Repair System with Balking, Reneging, Multiple Working Vacations and Two Removable Servers Operating under the Triadic (0, Q, N, M) Policy (2025) - Innovative Systems Design and Engineering, 11(4)",
+            "Controllable M/M/2 machine repair problem with multiple working vacations and triadic (0,Q,N,M) policy (2021) - International Journal of Management Science and Engineering Management, 16(3), 12",
+            "Applications of First Order Ordinary Differential Equation as Mathematical Model (2020) - Computational Mathematics and Modeling",
+            "Applications of First Order Ordinary Differential Equation as Mathematical Model (2020) - Preprint"
+        ],
+        "supervisory_capacity": None,
+        "current_students": None,
+        "completed_phds": 0,
+        "available_for_collaboration": True,
+        "collaboration_types": ["Joint Research", "Research Supervision"],
+        "phd_students_completed": [],
+        "email": "teketel.ketema@mekdelaamu.edu.et",
+        "phone": "Not Available",
+        "orcid_id": "Not Available",
+        "orcid_url": "",
+        "researchgate_url": "https://www.researchgate.net/profile/Teketel-Ketema-2",
+        "google_scholar_url": "https://scholar.google.com/citations?user=jkNEpYoAAAAJ&hl=en",
+        "scopus_url": "",
+        "institutional_id": "MKU/MATH/009",
+        "h_index": 7,
+        "total_citations": 606,
+        "trust_score": 85,
+        "last_verified": "2026-08-28",
+        "verification_badges": ["ResearchGate", "Google Scholar", "Publications", "PhD Candidate"],
+        "top_co_authors": [
+            {"name": "Seleshi Demie", "institution": "Andhra University"},
+            {"name": "Simon Derkee Zawka", "institution": "Arba Minch University"},
+            {"name": "Surafel Luleseged Tilahun", "institution": "Addis Ababa Science and Technology University"},
+            {"name": "Melisew Tefera Belachew", "institution": "Haramaya University"},
+            {"name": "Tigist Yitayew", "institution": ""},
+            {"name": "Abebe Geletu", "institution": "AIMS Rwanda"}
+        ],
+        "collaborating_institutions": ["Mekdela Amba University", "Arba Minch University", "Addis Ababa Science and Technology University", "Haramaya University", "Andhra University"],
+        "professional_memberships": [],
+        "biography": "Teketel Ketema is a Researcher at Mekdela Amba University in Desē, Ethiopia, affiliated with the Department of Mathematics. He is currently a PhD Candidate at Arba Minch University, working on data-driven predictive control systems and deep learning algorithms. His research focuses on optimal control, Koopman operator theory, and queuing systems. His recent work includes innovative approaches to reachability analysis for unknown nonlinear systems using deep learning techniques, combining neural networks with Q-learning algorithms. He has also extensively studied machine repair systems with various vacation policies and triadic control mechanisms. With an h-index of 7 and over 600 citations, his research has gained recognition in the academic community. He maintains strong collaborative ties with researchers at Arba Minch University, Addis Ababa Science and Technology University, and Haramaya University.",
+        "education_details": [
+            {"degree": "Ph.D. in Mathematics (Ongoing)", "institution": "Arba Minch University", "year": "2026"},
+            {"degree": "M.Sc. in Mathematics", "institution": "Information Not Available", "year": ""},
+            {"degree": "B.Sc. in Applied Mathematics", "institution": "Information Not Available", "year": ""}
+        ]
     }
 }
    
@@ -2330,7 +2392,7 @@ def show_about_page():
         <h2>📚✍️🌍ET ኢትዮጲያ🕊️🎓🚀About This Portal</h2>
         <p>The <b>Ethiopian Research Collaboration Portal</b> is a digital platform designed to bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
         <div class="stat-grid">
-            <div class="stat-card"><span class="number">8</span><span class="label">👨‍🏫 Verified Professionals</span></div>
+            <div class="stat-card"><span class="number">9</span><span class="label">👨‍🏫 Verified Professionals</span></div>
             <div class="stat-card"><span class="number">10</span><span class="label">🎓 Student Researchers</span></div>
             <div class="stat-card"><span class="number">100+</span><span class="label">📄 Publications</span></div>
             <div class="stat-card"><span class="number">30+</span><span class="label">🎯 PhDs Completed</span></div>
