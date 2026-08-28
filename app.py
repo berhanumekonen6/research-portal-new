@@ -2100,7 +2100,7 @@ RESEARCHER_PROFILES = {
         "collaboration_types": ["Joint Research", "Research Supervision"],
         "phd_students_completed": [],
         "email": "teketel.ketema@mekdelaamu.edu.et",
-        "phone": "Not Available",
+        "phone": "+251925355154",
         "orcid_id": "Not Available",
         "orcid_url": "",
         "researchgate_url": "https://www.researchgate.net/profile/Teketel-Ketema-2",
