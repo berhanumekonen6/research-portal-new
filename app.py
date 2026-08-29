@@ -2487,8 +2487,9 @@ def show_about_page():
             
             <div class="footer-credit">
                 🌿🇪🇹🎉 <span class="highlight-name">Dr. Berhanu Mekonen (PhD)</span> · 
+🌿📚✍️🌍ET ኢትዮጲያ🌍🕊️🎓🚀
                 <span class="highlight-institution">Arba Minch University</span> · 
-                August 4, 2026
+                June 25, 2026
             </div>
         </div>
     </body>
