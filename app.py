@@ -2129,14 +2129,12 @@ def show_chat():
                 except Exception as e:
                     st.error(f"Error sending message: {e}")
 
-# ===================================================================
-# ABOUT PAGE
-# ===================================================================
-
 def show_about_page():
-    \"\"\"Display detailed information about the Ethiopian Research Collaboration Portal\"\"\"
+    """Display detailed information about the Ethiopian Research Collaboration Portal"""
     
-    html_content = \"\"\"
+    st.markdown("### 📖 About This Portal")
+    
+    html_content = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -2482,27 +2480,27 @@ def show_about_page():
             </div>
             
             <div class="quote">
-                \"The Research Collaboration Portal is not just a tool—it's a movement to transform 
+                "The Research Collaboration Portal is not just a tool—it's a movement to transform 
                 Ethiopian research from isolated silos into a connected, collaborative, and globally 
-                competitive academic ecosystem.\"
+                competitive academic ecosystem."
             </div>
             
             <div class="footer-credit">
-                🌿🇪🇹🎉 <span class=\"highlight-name\">Dr. Berhanu Mekonen (PhD)</span> · 
-                <span class=\"highlight-institution\">Arba Minch University</span> · 
+                🌿🇪🇹🎉 <span class="highlight-name">Dr. Berhanu Mekonen (PhD)</span> · 
+                <span class="highlight-institution">Arba Minch University</span> · 
                 August 4, 2026
             </div>
         </div>
     </body>
     </html>
-    \"\"\"
+    """
     
     st.components.v1.html(html_content, height=700, scrolling=True)
     
-    if st.button(\"🔙 Back to Main Portal\", use_container_width=True):
+    if st.button("🔙 Back to Main Portal", use_container_width=True):
         st.session_state.show_about = False
         st.rerun()
-
+        
 # ===================================================================
 # USER READING MATERIALS PAGE
 # ===================================================================
