@@ -2129,37 +2129,377 @@ def show_chat():
                 except Exception as e:
                     st.error(f"Error sending message: {e}")
 
+# ===================================================================
+# ABOUT PAGE
+# ===================================================================
+
 def show_about_page():
-    st.markdown("### 📖 About This Portal")
-    st.markdown("""
-    <div style="background:#F8F9FA;padding:2rem;border-radius:16px;border:1px solid #E8EAED;">
-        <h2>🌿 Ethiopian Research Collaboration Portal</h2>
-        <p><strong>Purpose:</strong> To bridge the gap between Ethiopian researchers, academic professionals, and students by facilitating meaningful academic collaborations.</p>
-        
-        <h3>🎯 Key Benefits</h3>
-        <ul>
-            <li><b>Connect</b> with verified researchers across Ethiopian universities</li>
-            <li><b>Find</b> PhD/MSc supervisors in your field</li>
-            <li><b>Collaborate</b> on joint research projects</li>
-            <li><b>Access</b> reading materials and resources</li>
-            <li><b>Share</b> research papers and publications</li>
-        </ul>
-        
-        <h3>👨‍🏫 Featured Researchers</h3>
-        <ul>
-            <li>🧮 Dr. Berhanu Mekonen - Operations Research & Optimization</li>
-            <li>📊 Prof. Natesan Thillaigovindan - Queuing Theory & Stochastic Processes</li>
-            <li>🧠 Dr. Abebe Geletu - Systems Optimization & AI</li>
-            <li>📐 Prof. Gemechis File - Numerical Analysis & PDEs</li>
-        </ul>
-        
-        <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid #E8EAED;">
-            <p><em>Developed by Berhanu Mekonen, PhD · Arba Minch University · June 25, 2026</em></p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    \"\"\"Display detailed information about the Ethiopian Research Collaboration Portal\"\"\"
     
-    if st.button("🔙 Back to Main Portal", use_container_width=True):
+    html_content = \"\"\"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                background: #FFFFFF !important;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                margin: 0;
+                padding: 20px;
+                color: #202124 !important;
+                overflow-y: auto !important;
+                height: 100% !important;
+            }
+            .about-section {
+                background: #FFFFFF !important;
+                border: 1px solid #E8EAED;
+                border-radius: 16px;
+                padding: 2.5rem;
+                margin: 0;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+                color: #202124 !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+            .about-header {
+                display: flex;
+                align-items: center;
+                gap: 20px;
+                margin-bottom: 1.5rem;
+            }
+            .about-header .back-btn {
+                background: #F8F9FA !important;
+                border: 1px solid #DADCE0 !important;
+                color: #202124 !important;
+                padding: 10px 20px;
+                border-radius: 30px;
+                cursor: pointer;
+                font-size: 1rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                white-space: nowrap;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+            .about-header .back-btn:hover {
+                background: #E8F0FE !important;
+                border-color: #1A73E8 !important;
+                transform: translateX(-3px);
+            }
+            .about-header .back-btn .arrow {
+                display: inline-block;
+                transition: transform 0.3s ease;
+            }
+            .about-header .back-btn:hover .arrow {
+                transform: translateX(-3px);
+            }
+            .about-header h1 {
+                font-size: 3rem;
+                text-align: left;
+                background: linear-gradient(135deg, #1A73E8, #4285F4, #34A853);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                margin: 0;
+                flex: 1;
+                font-weight: 800 !important;
+            }
+            .about-section h2 {
+                font-size: 2.2rem;
+                color: #1A73E8 !important;
+                margin-top: 2rem;
+                border-bottom: 3px solid #E8F0FE;
+                padding-bottom: 0.5rem;
+                font-weight: 700 !important;
+            }
+            .about-section h3 {
+                font-size: 1.6rem;
+                color: #1A73E8 !important;
+                margin-top: 1.5rem;
+                font-weight: 600 !important;
+            }
+            .about-section .highlight-box {
+                background: #F8F9FA !important;
+                border-left: 4px solid #1A73E8;
+                padding: 1.5rem;
+                margin: 1rem 0;
+                border-radius: 8px;
+                color: #202124 !important;
+            }
+            .about-section .highlight-box p {
+                color: #202124 !important;
+                font-size: 1.2rem !important;
+                font-weight: 400 !important;
+            }
+            .about-section .stat-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 20px;
+                margin: 1.5rem 0;
+            }
+            .about-section .stat-card {
+                background: #F8F9FA !important;
+                border: 1px solid #E8EAED;
+                border-radius: 12px;
+                padding: 1.5rem;
+                text-align: center;
+                transition: all 0.3s;
+                color: #202124 !important;
+            }
+            .about-section .stat-card:hover {
+                transform: translateY(-3px);
+                border-color: #1A73E8 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            }
+            .about-section .stat-card .number {
+                font-size: 2.8rem;
+                font-weight: 800 !important;
+                color: #1A73E8 !important;
+                display: block;
+            }
+            .about-section .stat-card .label {
+                font-size: 1rem;
+                font-weight: 500 !important;
+                color: #5F6368 !important;
+            }
+            .about-section ul {
+                color: #202124 !important;
+                font-size: 1.1rem;
+                font-weight: 400 !important;
+                line-height: 2.2;
+                padding-left: 1.5rem;
+            }
+            .about-section ul li {
+                color: #202124 !important;
+            }
+            .about-section ul li b {
+                color: #202124 !important;
+                font-weight: 600 !important;
+            }
+            .about-section .quote {
+                font-style: italic;
+                font-size: 1.3rem;
+                font-weight: 500 !important;
+                color: #1A73E8 !important;
+                text-align: center;
+                padding: 1.5rem;
+                margin: 2rem 0;
+                border-top: 1px solid #E8EAED;
+                border-bottom: 1px solid #E8EAED;
+            }
+            .about-section .footer-credit {
+                text-align: center;
+                margin-top: 2.5rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid #E8EAED;
+                color: #5F6368 !important;
+                font-size: 1rem;
+                font-weight: 400 !important;
+                font-style: italic;
+                letter-spacing: 0.5px;
+            }
+            .about-section .footer-credit .highlight-name {
+                color: #1A73E8 !important;
+                font-weight: 600 !important;
+            }
+            .about-section .footer-credit .highlight-institution {
+                color: #34A853 !important;
+                font-weight: 600 !important;
+            }
+            .about-section p {
+                color: #202124 !important;
+                font-size: 1.2rem !important;
+                font-weight: 400 !important;
+            }
+            .about-section span {
+                color: #202124 !important;
+            }
+            .about-section div {
+                color: #202124 !important;
+            }
+            
+            ::-webkit-scrollbar {
+                width: 10px;
+            }
+            ::-webkit-scrollbar-track {
+                background: #F8F9FA;
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb {
+                background: #1A73E8;
+                border-radius: 10px;
+            }
+            ::-webkit-scrollbar-thumb:hover {
+                background: #1557B0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="about-section">
+            <div class="about-header">
+                <a href="#" onclick="window.parent.location.reload(); return false;" class="back-btn">
+                    <span class="arrow">←</span> Back to Home
+                </a>
+                <h1>🌿🌍ET🎉 About This Research Collaboration Portal🌍🕊️🎓</h1>
+            </div>
+            
+            <div class="highlight-box">
+                <p style="font-size:1.2rem; color:#202124 !important; font-weight:400 !important; margin: 0;">
+                    <b style="color:#1A73E8 !important; font-weight:700 !important;">🎯 OVERALL PURPOSE</b><br>
+                    The <b style="color:#1A73E8 !important; font-weight:700 !important;">Ethiopian Research Collaboration Portal</b> is a digital platform designed to 
+                    <b style="color:#34A853 !important; font-weight:600 !important;">bridge the gap</b> between Ethiopian researchers, academic professionals, 
+                    and students by facilitating <b style="color:#1A73E8 !important; font-weight:600 !important;">meaningful academic collaborations</b>.
+                </p>
+            </div>
+            
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <span class="number">2</span>
+                    <span class="label">👨‍🏫 Verified Professionals</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number">10</span>
+                    <span class="label">🎓 Student Researchers</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number">24</span>
+                    <span class="label">📄 Publications</span>
+                </div>
+                <div class="stat-card">
+                    <span class="number">13</span>
+                    <span class="label">🎯 PhDs Completed</span>
+                </div>
+            </div>
+            
+            <h2>📌 KEY IMPORTANCE &amp; BENEFITS</h2>
+            
+            <h3>1. 🌍 Connecting Ethiopian Researchers</h3>
+            <ul>
+                <li><b>Breaks down silos</b> between universities and institutions</li>
+                <li>Creates a <b>unified network</b> of Ethiopian academic professionals</li>
+                <li>Enables <b>cross-institutional collaboration</b></li>
+                <li>Promotes <b>knowledge sharing</b> across disciplines</li>
+            </ul>
+            
+            <h3>2. 🎓 Enhancing Research Supervision</h3>
+            <ul>
+                <li>PhD and MSc students can <b>find qualified supervisors</b></li>
+                <li>Matches students with <b>experts in their research field</b></li>
+                <li>Reduces the <b>time and effort</b> needed to find appropriate supervisors</li>
+                <li>Increases <b>student success rates</b> through proper guidance</li>
+            </ul>
+            
+            <h3>3. 🤝 Promoting Joint Research</h3>
+            <ul>
+                <li>Enables researchers to <b>find collaborators</b> with complementary expertise</li>
+                <li>Facilitates <b>interdisciplinary research projects</b></li>
+                <li>Increases <b>research output and publications</b></li>
+                <li>Strengthens <b>Ethiopia's research capacity</b></li>
+            </ul>
+            
+            <h3>4. 💼 Consultancy Opportunities</h3>
+            <ul>
+                <li>Connects <b>academic experts</b> with organizations needing consultancy</li>
+                <li>Enables <b>knowledge transfer</b> from academia to industry</li>
+                <li>Creates <b>income-generating opportunities</b> for academics</li>
+                <li>Supports <b>evidence-based decision making</b> in various sectors</li>
+            </ul>
+            
+            <h2>🔬 DISCIPLINES COVERED</h2>
+            <ul>
+                <li><b>🧮 Mathematics</b> - Dr. Berhanu Mekonen</li>
+                <li><b>📊 Stochastic Processes</b> - Prof. Natesan Thillaigovindan</li>
+            </ul>
+            
+            <h2>📈 SPECIFIC USES</h2>
+            
+            <h3>For <span style="color:#1A73E8 !important; font-weight:600 !important;">Students &amp; Researchers:</span></h3>
+            <ul>
+                <li>✅ Find <b>PhD/MSc supervisors</b></li>
+                <li>✅ Discover <b>research collaborators</b></li>
+                <li>✅ Get <b>expert consultancy</b></li>
+                <li>✅ Submit <b>formal collaboration requests</b></li>
+                <li>✅ Generate <b>professional request letters</b></li>
+            </ul>
+            
+            <h3>For <span style="color:#34A853 !important; font-weight:600 !important;">Academicians &amp; Professors:</span></h3>
+            <ul>
+                <li>✅ Showcase <b>expertise and research interests</b></li>
+                <li>✅ Find <b>supervisees</b></li>
+                <li>✅ Identify <b>joint research partners</b></li>
+                <li>✅ Offer <b>consultancy services</b></li>
+                <li>✅ Expand <b>professional network</b></li>
+            </ul>
+            
+            <h2>💡 ADVANCED FEATURES</h2>
+            
+            <h3>🔍 Smart Search</h3>
+            <ul>
+                <li>Search by <b>name, research area, institution, department, specialization, collaboration type, or keywords</b></li>
+                <li>Filter <b>available professionals only</b></li>
+            </ul>
+            
+            <h3>📝 Request Management</h3>
+            <ul>
+                <li>Submit <b>supervision, joint research, or consultancy requests</b></li>
+                <li>Track <b>request status</b> (Pending/Approved/Rejected)</li>
+                <li>Generate <b>formal request letters</b> automatically</li>
+                <li>Follow up with <b>email integration</b></li>
+            </ul>
+            
+            <h3>📊 Real-Time Dashboard</h3>
+            <ul>
+                <li>Live <b>status indicators</b></li>
+                <li>View <b>available slots</b> for each professional</li>
+                <li>See <b>completed PhDs</b> and <b>publications</b></li>
+            </ul>
+            
+            <h2>🎯 WHO BENEFITS?</h2>
+            <ul>
+                <li><b>PhD Students:</b> Find supervisors, get guidance</li>
+                <li><b>MSc Students:</b> Research collaboration, mentorship</li>
+                <li><b>Professors:</b> Supervise students, joint research</li>
+                <li><b>Researchers:</b> Collaborators, publications</li>
+                <li><b>Universities:</b> Research output, reputation</li>
+                <li><b>Ethiopia:</b> Knowledge economy, development</li>
+            </ul>
+            
+            <h2>📌 SUMMARY</h2>
+            <div class="highlight-box">
+                <p style="color:#202124 !important; font-size:1.2rem !important; font-weight:400 !important;">The <b style="color:#1A73E8 !important; font-weight:700 !important;">Ethiopian Research Collaboration Portal</b> is a <b style="color:#34A853 !important; font-weight:600 !important;">game-changer</b> for Ethiopian academia because it:</p>
+                <ul>
+                    <li>✅ <b>Connects</b> Ethiopian researchers across institutions</li>
+                    <li>✅ <b>Facilitates</b> research supervision and mentorship</li>
+                    <li>✅ <b>Promotes</b> joint research and publications</li>
+                    <li>✅ <b>Creates</b> consultancy opportunities</li>
+                    <li>✅ <b>Builds</b> research capacity in Ethiopia</li>
+                    <li>✅ <b>Strengthens</b> academic networks</li>
+                    <li>✅ <b>Drives</b> national development through research</li>
+                    <li>✅ <b>Showcases</b> Ethiopian academic excellence</li>
+                </ul>
+            </div>
+            
+            <div class="quote">
+                \"The Research Collaboration Portal is not just a tool—it's a movement to transform 
+                Ethiopian research from isolated silos into a connected, collaborative, and globally 
+                competitive academic ecosystem.\"
+            </div>
+            
+            <div class="footer-credit">
+                🌿🇪🇹🎉 <span class=\"highlight-name\">Dr. Berhanu Mekonen (PhD)</span> · 
+                <span class=\"highlight-institution\">Arba Minch University</span> · 
+                August 4, 2026
+            </div>
+        </div>
+    </body>
+    </html>
+    \"\"\"
+    
+    st.components.v1.html(html_content, height=700, scrolling=True)
+    
+    if st.button(\"🔙 Back to Main Portal\", use_container_width=True):
         st.session_state.show_about = False
         st.rerun()
 
