@@ -2340,7 +2340,7 @@ def show_about_page():
                 <a href="#" onclick="window.parent.location.reload(); return false;" class="back-btn">
                     <span class="arrow">←</span> Back to Home
                 </a>
-                <h1>About This Research Collaboration Portal</h1>🌿🌍ET🕊️🎓🎉 
+                <h1> About This Research Collaboration Portal</h1>🌿🌍ET🕊️🎓🎉 
             </div>
             
             <div class="highlight-box">
@@ -2354,7 +2354,7 @@ def show_about_page():
             
             <div class="stat-grid">
                 <div class="stat-card">
-                    <span class="number">2</span>
+                    <span class="number">9</span>
                     <span class="label">👨‍🏫 Verified Professionals</span>
                 </div>
                 <div class="stat-card">
@@ -2362,11 +2362,11 @@ def show_about_page():
                     <span class="label">🎓 Student Researchers</span>
                 </div>
                 <div class="stat-card">
-                    <span class="number">24</span>
+                    <span class="number">79</span>
                     <span class="label">📄 Publications</span>
                 </div>
                 <div class="stat-card">
-                    <span class="number">13</span>
+                    <span class="number">37</span>
                     <span class="label">🎯 PhDs Completed</span>
                 </div>
             </div>
