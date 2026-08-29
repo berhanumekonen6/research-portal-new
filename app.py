@@ -2340,7 +2340,7 @@ def show_about_page():
                 <a href="#" onclick="window.parent.location.reload(); return false;" class="back-btn">
                     <span class="arrow">←</span> Back to Home
                 </a>
-                <h1>🌿🌍ET🎉 About This Research Collaboration Portal🌍🕊️🎓</h1>
+                <h1>About This Research Collaboration Portal</h1>🌿🌍ET🕊️🎓🎉 
             </div>
             
             <div class="highlight-box">
