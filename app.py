@@ -1282,7 +1282,7 @@ def show_celebration_page():
         st.components.v1.html(html_content, height=800, scrolling=False)
 
 # ===================================================================
-# RESEARCHER PROFILES
+# RESEARCHER PROFILES - WITH CLICKABLE SOCIAL BADGES
 # ===================================================================
 
 RESEARCHER_PROFILES = {
@@ -1874,7 +1874,6 @@ RESEARCHER_PROFILES = {
         ]
     }
 }
-   
 # ===================================================================
 # HELPER FUNCTIONS
 # ===================================================================
