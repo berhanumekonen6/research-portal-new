@@ -3539,7 +3539,7 @@ def main():
             show_researcher_of_month()
             st.markdown("---")
         st.markdown("### Find Academic Professionals")
-                with st.container():
+        with st.container():
             st.markdown('<div class="search-section">', unsafe_allow_html=True)
             col1, col2, col3 = st.columns([1, 1.5, 0.8])
             with col1:
