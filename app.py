@@ -2645,7 +2645,7 @@ def show_user_reading_materials():
         col4.metric("👁️ Total Views", sum(m.get('views', 0) for m in st.session_state.reading_materials))
 
 # ===================================================================
-# ADMIN READING MATERIALS MANAGEMENT
+# ADMIN READING MATERIALS MANAGEMENT - WITH FILE UPDATE CAPABILITY
 # ===================================================================
 
 def show_admin_reading_materials():
@@ -2663,6 +2663,8 @@ def show_admin_reading_materials():
         st.session_state.reading_materials = []
     if 'material_id_counter' not in st.session_state:
         st.session_state.material_id_counter = 0
+    if 'edit_material_id' not in st.session_state:
+        st.session_state.edit_material_id = None
     
     tab1, tab2, tab3 = st.tabs(["📤 Upload Material", "📚 Manage Materials", "📊 Statistics"])
     
@@ -2690,7 +2692,7 @@ def show_admin_reading_materials():
                 )
             
             with col2:
-                material_author = st.text_input("✍️ Author/Uploader *", value="Admin")
+                material_author = st.text_input("✍️ Author/Uploader *", value=st.session_state.current_user)
                 material_tags = st.text_input("🏷️ Tags (comma separated)", placeholder="e.g., research, methodology, statistics")
                 material_language = st.selectbox(
                     "🌍 Language",
@@ -2720,7 +2722,7 @@ def show_admin_reading_materials():
                 if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
                     st.image(uploaded_file, caption="File Preview", use_container_width=True)
                 elif file_extension == 'pdf':
-                    st.info("📄 PDF file ready for upload. Users can download and view it.")
+                    st.success(f"✅ PDF file ready for upload: **{uploaded_file.name}** ({uploaded_file.size/1024:.1f} KB)")
                 elif file_extension in ['txt', 'csv']:
                     try:
                         content = uploaded_file.getvalue().decode('utf-8')
@@ -2728,7 +2730,7 @@ def show_admin_reading_materials():
                     except:
                         st.info("File content preview not available.")
                 else:
-                    st.info(f"📄 File type: {file_extension.upper()}. Ready for upload.")
+                    st.success(f"✅ File ready for upload: **{uploaded_file.name}** ({uploaded_file.size/1024:.1f} KB)")
             
             st.markdown("---")
             col1, col2, col3 = st.columns([1, 2, 1])
@@ -2866,6 +2868,11 @@ def show_admin_reading_materials():
                     <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem;">
                         {"".join(f'<span style="background:#F8F9FA;color:#5F6368;padding:2px 10px;border-radius:15px;font-size:0.75rem;border:1px solid #E8EAED;">#{tag}</span>' for tag in material.get('tags', [])[:5])}
                     </div>
+                    <div style="margin-top:0.5rem;">
+                        <span style="color:#5F6368;font-size:0.8rem;">📎 File: {material.get('file_name', 'No file')}</span>
+                        {f'<span style="color:#5F6368;font-size:0.8rem;margin-left:10px;">📦 {material.get("file_size", 0)/1024:.1f} KB</span>' if material.get('file_size') else ''}
+                        {f'<span style="color:#5F6368;font-size:0.8rem;margin-left:10px;">🔗 {material.get("external_link", "No link")[:30]}...</span>' if material.get('external_link') else ''}
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -2881,7 +2888,7 @@ def show_admin_reading_materials():
                             key=f"admin_download_{material['id']}"
                         )
                     elif material.get('external_link'):
-                        st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;">🔗 Open Link</a>', unsafe_allow_html=True)
+                        st.markdown(f'<a href="{material["external_link"]}" target="_blank" style="background:#1A73E8;color:white;padding:8px 20px;border-radius:25px;text-decoration:none;font-weight:500;display:inline-block;border:none;cursor:pointer;text-align:center;width:100%;">🔗 Open Link</a>', unsafe_allow_html=True)
                 
                 with col2:
                     if st.button("📋 Edit", key=f"edit_{material['id']}"):
@@ -2900,49 +2907,173 @@ def show_admin_reading_materials():
                         except Exception as e:
                             st.error(f"❌ Error deleting: {e}")
                 
+                # Edit mode with full update capability including file
                 if st.session_state.get('edit_material_id') == material['id']:
                     st.markdown("---")
                     st.markdown("#### ✏️ Edit Material")
+                    st.info("💡 Upload a new file to replace the existing file. Leave empty to keep the current file.")
                     
                     with st.form(f"edit_form_{material['id']}"):
-                        edit_title = st.text_input("Title", value=material['title'])
-                        edit_category = st.selectbox("Category", ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"], 
-                            index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"].index(material['category']) if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] else 0)
-                        edit_description = st.text_area("Description", value=material['description'])
-                        edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material.get('tags', [])))
-                        edit_level = st.selectbox("Target Level", ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"], 
-                            index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] else 0)
+                        col1, col2 = st.columns(2)
                         
+                        with col1:
+                            edit_title = st.text_input("Title", value=material['title'])
+                            edit_category = st.selectbox(
+                                "Category", 
+                                ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", 
+                                 "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", 
+                                 "Reference Materials", "Study Guides", "Other"],
+                                index=["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", "Thesis Templates", 
+                                       "Conference Proceedings", "Journal Articles", "Tutorials", "Case Studies", 
+                                       "Reference Materials", "Study Guides", "Other"].index(material['category']) 
+                                if material['category'] in ["Research Papers", "Textbooks", "Lecture Notes", "Lab Manuals", 
+                                                             "Thesis Templates", "Conference Proceedings", "Journal Articles", 
+                                                             "Tutorials", "Case Studies", "Reference Materials", "Study Guides", "Other"] 
+                                else 0
+                            )
+                            edit_type = st.selectbox(
+                                "Material Type",
+                                ["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"],
+                                index=["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"].index(material['type']) 
+                                if material['type'] in ["PDF", "Word Document", "PowerPoint", "Excel", "Image", "Video", "Link", "Other"] 
+                                else 0
+                            )
+                            edit_level = st.selectbox(
+                                "Target Level", 
+                                ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"],
+                                index=["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"].index(material['level']) 
+                                if material['level'] in ["All Levels", "Undergraduate", "Masters", "PhD", "Postdoctoral", "Faculty", "Researchers"] 
+                                else 0
+                            )
+                        
+                        with col2:
+                            edit_author = st.text_input("Author/Uploader", value=material['author'])
+                            edit_tags = st.text_input("Tags (comma separated)", value=", ".join(material.get('tags', [])))
+                            edit_language = st.selectbox(
+                                "Language",
+                                ["English", "Amharic", "Both"],
+                                index=["English", "Amharic", "Both"].index(material['language']) 
+                                if material['language'] in ["English", "Amharic", "Both"] 
+                                else 0
+                            )
+                            edit_access = st.selectbox(
+                                "Access Level",
+                                ["Public", "Registered Users Only", "Admin Only"],
+                                index=["Public", "Registered Users Only", "Admin Only"].index(material['access']) 
+                                if material['access'] in ["Public", "Registered Users Only", "Admin Only"] 
+                                else 0
+                            )
+                        
+                        edit_description = st.text_area("Description", value=material['description'], height=100)
+                        edit_keywords = st.text_input("Keywords (comma separated)", value=", ".join(material.get('keywords', [])))
+                        
+                        # Show current file info
+                        if material.get('file_name'):
+                            st.info(f"📎 Current file: **{material['file_name']}** ({material.get('file_size', 0)/1024:.1f} KB)")
+                        elif material.get('external_link'):
+                            st.info(f"🔗 Current link: {material['external_link']}")
+                        
+                        # File upload for update
+                        edit_uploaded_file = st.file_uploader(
+                            "📎 Upload New File (optional - to replace existing)",
+                            type=['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'gif', 'txt', 'csv', 'zip'],
+                            help="Upload a new file to replace the current one. Leave empty to keep existing file.",
+                            key=f"edit_file_{material['id']}"
+                        )
+                        
+                        edit_external_link = st.text_input("🔗 External Link (optional)", value=material.get('external_link', ''))
+                        
+                        if edit_uploaded_file:
+                            st.markdown("---")
+                            st.markdown("#### 📄 New File Preview")
+                            file_extension = edit_uploaded_file.name.split('.')[-1].lower() if edit_uploaded_file.name else ''
+                            if file_extension in ['jpg', 'jpeg', 'png', 'gif']:
+                                st.image(edit_uploaded_file, caption="File Preview", use_container_width=True)
+                            elif file_extension == 'pdf':
+                                st.success(f"✅ New PDF ready: **{edit_uploaded_file.name}** ({edit_uploaded_file.size/1024:.1f} KB)")
+                            else:
+                                st.success(f"✅ New file ready: **{edit_uploaded_file.name}** ({edit_uploaded_file.size/1024:.1f} KB)")
+                        
+                        st.markdown("---")
                         col1, col2 = st.columns(2)
                         with col1:
-                            if st.form_submit_button("💾 Save Changes"):
-                                supabase_admin = get_supabase_admin()
+                            save_clicked = st.form_submit_button("💾 Save Changes", use_container_width=True)
+                        with col2:
+                            cancel_clicked = st.form_submit_button("❌ Cancel", use_container_width=True)
+                        
+                        if cancel_clicked:
+                            st.session_state.edit_material_id = None
+                            st.rerun()
+                        
+                        if save_clicked:
+                            if not edit_title or not edit_author or not edit_category or not edit_description:
+                                st.error("❌ Please fill in all required fields (Title, Author, Category, Description).")
+                            else:
                                 try:
+                                    supabase_admin = get_supabase_admin()
+                                    
+                                    # Prepare update data
                                     update_data = {
                                         "title": edit_title,
                                         "category": edit_category,
+                                        "type": edit_type,
+                                        "author": edit_author,
                                         "description": edit_description,
                                         "tags": json.dumps([t.strip() for t in edit_tags.split(",")]) if edit_tags else json.dumps([]),
-                                        "level": edit_level
+                                        "keywords": json.dumps([k.strip() for k in edit_keywords.split(",")]) if edit_keywords else json.dumps([]),
+                                        "level": edit_level,
+                                        "language": edit_language,
+                                        "access": edit_access,
+                                        "external_link": edit_external_link
                                     }
+                                    
+                                    # Handle file update if new file uploaded
+                                    if edit_uploaded_file:
+                                        file_data = edit_uploaded_file.getvalue()
+                                        file_name = edit_uploaded_file.name
+                                        file_type = edit_uploaded_file.type
+                                        file_size = len(file_data)
+                                        file_data_b64 = base64.b64encode(file_data).decode('utf-8')
+                                        
+                                        update_data["file_data_b64"] = file_data_b64
+                                        update_data["file_name"] = file_name
+                                        update_data["file_type"] = file_type
+                                        update_data["file_size"] = file_size
+                                        
+                                        # Store file data for session update
+                                        new_file_data = file_data
+                                    else:
+                                        new_file_data = material.get('file_data')
+                                    
+                                    # Update in Supabase
                                     supabase_admin.table("reading_materials").update(update_data).eq("id", material['id']).execute()
                                     
+                                    # Update in session state
                                     material['title'] = edit_title
                                     material['category'] = edit_category
+                                    material['type'] = edit_type
+                                    material['author'] = edit_author
                                     material['description'] = edit_description
                                     material['tags'] = [t.strip() for t in edit_tags.split(",")] if edit_tags else []
+                                    material['keywords'] = [k.strip() for k in edit_keywords.split(",")] if edit_keywords else []
                                     material['level'] = edit_level
+                                    material['language'] = edit_language
+                                    material['access'] = edit_access
+                                    material['external_link'] = edit_external_link
+                                    
+                                    if edit_uploaded_file:
+                                        material['file_data'] = new_file_data
+                                        material['file_name'] = edit_uploaded_file.name
+                                        material['file_type'] = edit_uploaded_file.type
+                                        material['file_size'] = len(edit_uploaded_file.getvalue())
                                     
                                     add_notification(f"📝 Material '{material['title']}' updated", "info")
                                     st.success("✅ Material updated successfully!")
                                     st.session_state.edit_material_id = None
                                     st.rerun()
+                                    
                                 except Exception as e:
-                                    st.error(f"❌ Error updating: {e}")
-                        with col2:
-                            if st.form_submit_button("❌ Cancel"):
-                                st.session_state.edit_material_id = None
-                                st.rerun()
+                                    st.error(f"❌ Error updating: {str(e)}")
                 
                 st.markdown("---")
     
@@ -2984,6 +3115,16 @@ def show_admin_reading_materials():
             fig2 = px.pie(df_levels, values='Count', names='Level', title='Materials by Target Level', color_discrete_sequence=px.colors.sequential.Greens_r)
             fig2.update_layout(height=400)
             st.plotly_chart(fig2, use_container_width=True)
+        
+        # Most viewed/downloaded
+        st.markdown("#### 📈 Most Popular Materials")
+        if st.session_state.reading_materials:
+            sorted_by_downloads = sorted(st.session_state.reading_materials, key=lambda x: x.get('downloads', 0), reverse=True)[:5]
+            
+            if sorted_by_downloads:
+                st.markdown("**Top 5 Most Downloaded:**")
+                for m in sorted_by_downloads:
+                    st.markdown(f"- **{m['title']}** - {m.get('downloads', 0)} downloads, {m.get('views', 0)} views")
 
 # ===================================================================
 # ADMIN PANEL
