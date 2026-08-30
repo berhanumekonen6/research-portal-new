@@ -3539,7 +3539,7 @@ def main():
             show_researcher_of_month()
             st.markdown("---")
         st.markdown("### Find Academic Professionals")
-        with st.container():
+                with st.container():
             st.markdown('<div class="search-section">', unsafe_allow_html=True)
             col1, col2, col3 = st.columns([1, 1.5, 0.8])
             with col1:
@@ -3550,7 +3550,7 @@ def main():
                 show_available_only = st.checkbox("Available Only", value=True)
             st.markdown('</div>', unsafe_allow_html=True)
 
-                filtered_profs = search_academicians(academicians_df, prof_search_query, prof_search_type)
+        filtered_profs = search_academicians(academicians_df, prof_search_query, prof_search_type)
         if show_available_only:
             filtered_profs = filtered_profs[filtered_profs['available_for_collaboration'] == True]
         st.caption(f"Found {len(filtered_profs)} verified professional(s)")
