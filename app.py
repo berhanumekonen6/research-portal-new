@@ -3561,46 +3561,47 @@ def main():
             status_text = f"{slots} slots available" if slots > 0 else "Fully booked"
             with st.expander(f"{prof['profile_image']} {prof['name']} - {prof['title']}", expanded=False):
                 col1, col2 = st.columns([2, 1])
-                with col1:
+                                with col1:
                     # Create clickable verification badges
-verification_html = ""
+                    verification_html = ""
 
-# ORCID Badge
-if prof.get('orcid_url') and prof['orcid_url'].strip():
-    verification_html += f'<a href="{prof["orcid_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#E8F0FE;color:#1A73E8;border:1px solid #1A73E8;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">🆔 ORCID</a>'
-else:
-    verification_html += f'<span class="badge-verified" style="opacity:0.5;">🆔 ORCID</span>'
+                    # ORCID Badge
+                    if prof.get('orcid_url') and prof['orcid_url'].strip():
+                        verification_html += f'<a href="{prof["orcid_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#E8F0FE;color:#1A73E8;border:1px solid #1A73E8;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">🆔 ORCID</a>'
+                    else:
+                        verification_html += f'<span class="badge-verified" style="opacity:0.5;">🆔 ORCID</span>'
 
-# ResearchGate Badge
-if prof.get('researchgate_url') and prof['researchgate_url'].strip():
-    verification_html += f'<a href="{prof["researchgate_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#E6F4EA;color:#34A853;border:1px solid #34A853;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">🔬 ResearchGate</a>'
-else:
-    verification_html += f'<span class="badge-verified" style="opacity:0.5;">🔬 ResearchGate</span>'
+                    # ResearchGate Badge
+                    if prof.get('researchgate_url') and prof['researchgate_url'].strip():
+                        verification_html += f'<a href="{prof["researchgate_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#E6F4EA;color:#34A853;border:1px solid #34A853;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">🔬 ResearchGate</a>'
+                    else:
+                        verification_html += f'<span class="badge-verified" style="opacity:0.5;">🔬 ResearchGate</span>'
 
-# Google Scholar Badge
-if prof.get('google_scholar_url') and prof['google_scholar_url'].strip():
-    verification_html += f'<a href="{prof["google_scholar_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#FCE8E6;color:#EA4335;border:1px solid #EA4335;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">📚 Google Scholar</a>'
-else:
-    verification_html += f'<span class="badge-verified" style="opacity:0.5;">📚 Google Scholar</span>'
+                    # Google Scholar Badge
+                    if prof.get('google_scholar_url') and prof['google_scholar_url'].strip():
+                        verification_html += f'<a href="{prof["google_scholar_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#FCE8E6;color:#EA4335;border:1px solid #EA4335;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">📚 Google Scholar</a>'
+                    else:
+                        verification_html += f'<span class="badge-verified" style="opacity:0.5;">📚 Google Scholar</span>'
 
-# Scopus Badge
-if prof.get('scopus_url') and prof['scopus_url'].strip():
-    verification_html += f'<a href="{prof["scopus_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#FFF3E0;color:#FB8C00;border:1px solid #FB8C00;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">📊 Scopus</a>'
-else:
-    verification_html += f'<span class="badge-verified" style="opacity:0.5;">📊 Scopus</span>'
+                    # Scopus Badge
+                    if prof.get('scopus_url') and prof['scopus_url'].strip():
+                        verification_html += f'<a href="{prof["scopus_url"]}" target="_blank" class="badge-verified" style="text-decoration:none;display:inline-block;margin:2px;background:#FFF3E0;color:#FB8C00;border:1px solid #FB8C00;padding:3px 12px;border-radius:20px;font-size:0.8rem;font-weight:500;">📊 Scopus</a>'
+                    else:
+                        verification_html += f'<span class="badge-verified" style="opacity:0.5;">📊 Scopus</span>'
 
-# Social Links (larger buttons for contact section)
-social_links_html = ""
-if prof.get('orcid_url') and prof['orcid_url'].strip():
-    social_links_html += f'<a href="{prof["orcid_url"]}" target="_blank" class="social-link social-link-orcid">ORCID</a>'
-if prof.get('researchgate_url') and prof['researchgate_url'].strip():
-    social_links_html += f'<a href="{prof["researchgate_url"]}" target="_blank" class="social-link social-link-researchgate">ResearchGate</a>'
-if prof.get('google_scholar_url') and prof['google_scholar_url'].strip():
-    social_links_html += f'<a href="{prof["google_scholar_url"]}" target="_blank" class="social-link social-link-scholar">Google Scholar</a>'
-if prof.get('scopus_url') and prof['scopus_url'].strip():
-    social_links_html += f'<a href="{prof["scopus_url"]}" target="_blank" class="social-link social-link-scopus">Scopus</a>'
-if social_links_html:
-    social_links_html = f'<div class="social-links">{social_links_html}</div>'
+                    # Social Links (larger buttons for contact section)
+                    social_links_html = ""
+                    if prof.get('orcid_url') and prof['orcid_url'].strip():
+                        social_links_html += f'<a href="{prof["orcid_url"]}" target="_blank" class="social-link social-link-orcid">ORCID</a>'
+                    if prof.get('researchgate_url') and prof['researchgate_url'].strip():
+                        social_links_html += f'<a href="{prof["researchgate_url"]}" target="_blank" class="social-link social-link-researchgate">ResearchGate</a>'
+                    if prof.get('google_scholar_url') and prof['google_scholar_url'].strip():
+                        social_links_html += f'<a href="{prof["google_scholar_url"]}" target="_blank" class="social-link social-link-scholar">Google Scholar</a>'
+                    if prof.get('scopus_url') and prof['scopus_url'].strip():
+                        social_links_html += f'<a href="{prof["scopus_url"]}" target="_blank" class="social-link social-link-scopus">Scopus</a>'
+                    if social_links_html:
+                        social_links_html = f'<div class="social-links">{social_links_html}</div>'
+
                     st.markdown(f"""
                     <div class="professor-card">
                         <div class="card-header">
