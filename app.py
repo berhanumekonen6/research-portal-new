@@ -3555,13 +3555,13 @@ def main():
             filtered_profs = filtered_profs[filtered_profs['available_for_collaboration'] == True]
         st.caption(f"Found {len(filtered_profs)} verified professional(s)")
 
-        for _, prof in filtered_profs.iterrows():
+                for _, prof in filtered_profs.iterrows():
             slots = prof['supervisory_capacity'] - prof['current_students']
             status_class = "badge-available" if slots > 0 else "badge-full"
             status_text = f"{slots} slots available" if slots > 0 else "Fully booked"
             with st.expander(f"{prof['profile_image']} {prof['name']} - {prof['title']}", expanded=False):
                 col1, col2 = st.columns([2, 1])
-                                with col1:
+                with col1:
                     # Create clickable verification badges
                     verification_html = ""
 
